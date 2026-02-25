@@ -1,0 +1,289 @@
+:host {
+  display: block;
+  overflow-x: hidden;
+}
+
+mtx-alert {
+  --mtx-alert-container-shape: 24px;
+
+  position: sticky;
+  top: 8px;
+  z-index: 1000;
+}
+
+
+/* ================= UTILITIES ================= */
+.text-muted { color: #64748b; }
+.text-danger { color: #dc2626; }
+.text-success { color: #16a34a; }
+.fw-bold { font-weight: 700; }
+.fw-medium { font-weight: 500; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-center { display: flex; align-items: center; }
+.me-2 { margin-right: 8px; }
+
+/* ================= FILTER CARD ================= */
+.filter-card { 
+    background-color: #ffffff; 
+    border-radius: 12px; 
+    padding: 24px; 
+    margin-bottom: 24px; 
+    border: 1px solid #e2e8f0; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.filter-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 20px;
+    align-items: end;
+}
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+.custom-input {
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: #475569;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.custom-input:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+.dashed-divider {
+    border-top: 1px dashed #e2e8f0;
+    margin: 20px 0;
+}
+
+/* ================= BUTTONS ================= */
+.btn {
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.custom-btn-primary { background-color: #6366f1; color: white; width: 100%; }
+.custom-btn-primary:hover { background-color: #4f46e5; }
+
+.btn-action { border-radius: 8px; padding: 6px 14px; font-size: 0.85rem; background: transparent; margin-left: 4px;}
+.btn-outline-primary { border-color: #6366f1; color: #6366f1; }
+.btn-outline-primary:hover { background-color: #6366f1; color: white; }
+
+.btn-outline-danger { border-color: #dc2626; color: #dc2626; }
+.btn-outline-danger:hover { background-color: #dc2626; color: white; }
+
+.btn-outline-success { border-color: #16a34a; color: #16a34a; }
+.btn-outline-success:hover { background-color: #16a34a; color: white; }
+
+.btn-light { background-color: #f1f5f9; color: #334155; border-radius: 8px; }
+.btn-light:hover { background-color: #e2e8f0; }
+.btn-danger { background-color: #ef4444; color: white; border-radius: 8px; }
+.btn-success { background-color: #22c55e; color: white; border-radius: 8px; }
+
+/* ================= TABLE ================= */
+.table-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+    width: 100%;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background-color: #f8fafc; }
+.text-end { text-align: right; }
+
+/* STATUS BADGES */
+.status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+.status-active { background-color: #dcfce7; color: #16a34a; }
+.status-disabled { background-color: #fee2e2; color: #dc2626; }
+
+/* ================= PAGINATION ================= */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    background-color: #fff;
+}
+.pagination {
+    display: flex;
+    list-style: none;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+}
+.page-link {
+    text-decoration: none;
+    color: #1e293b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+.page-link.active { background-color: #6366f1; color: white; }
+.page-link.disabled { color: #94a3b8; cursor: not-allowed; }
+.page-link:not(.active):not(.disabled):hover { background-color: #f1f5f9; }
+
+/* ================= MODALS ================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+}
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    padding: 24px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.show .modal-content {
+    transform: translateY(0);
+}
+.modal-content.modal-sm { max-width: 400px; }
+
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-title { font-size: 1.25rem; margin: 0; }
+.close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+.modal-body { margin-bottom: 24px; line-height: 1.6; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; }
+
+/* Modal Grid Details */
+.detail-row { display: flex; margin-bottom: 10px; font-size: 0.95rem; }
+.detail-label { width: 40%; color: #64748b; }
+.detail-value { width: 60%; font-weight: 500; }
+
+
+/* ================= RESPONSIVE DESIGN (MOBILE & TABLET) ================= */
+
+@media (max-width: 992px) {
+    /* Tablet screens ke liye filters ko thora adjust kiya */
+    .form-grid-3 {
+        grid-template-columns: 1fr 1fr; /* 2 columns on tablet */
+    }
+    .form-grid-3 div:last-child {
+        grid-column: span 2; /* Button takes full width on tablet */
+    }
+}
+
+@media (max-width: 768px) {
+    /* 1. Stack all filter inputs on mobile */
+    .form-grid, 
+    .form-grid-3 {
+        grid-template-columns: 1fr; 
+        gap: 16px;
+    }
+    .form-grid-3 div:last-child {
+        grid-column: span 1; /* Reset button width for mobile */
+    }
+
+    /* 2. Responsive Table (Horizontal Scroll) */
+    .table-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scroll on iPhones */
+    }
+    table {
+        min-width: 800px; /* Force table width so it scrolls instead of breaking */
+    }
+
+    /* 3. Responsive Pagination */
+    .pagination-container {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+        padding: 16px;
+    }
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    /* 4. Responsive Modals */
+    .modal-content {
+        padding: 20px;
+        margin: 16px; /* Phone ki screen edges se thora fasla */
+        width: calc(100% - 32px);
+    }
+    
+    .detail-row {
+        flex-direction: column; /* Label aur Value ko upar-neeche kar diya */
+        margin-bottom: 12px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 8px;
+    }
+    .detail-label, 
+    .detail-value {
+        width: 100%;
+    }
+    .detail-label {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+    .detail-value {
+        font-size: 1rem;
+    }
+}

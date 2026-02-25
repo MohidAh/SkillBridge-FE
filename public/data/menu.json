@@ -1,0 +1,33 @@
+{
+  "menu": [
+    {
+      "route": "dashboard",
+      "name": "dashboard",
+      "type": "link",
+      "icon": "dashboard",
+      "badge": {
+        "color": "red-50",
+        "value": "5"
+      }
+    },
+    {
+      "route": "manage-students",
+      "name": "manage_students",
+      "type": "sub",
+      "icon": "people",
+      "children": [
+        {
+          "route": "students",
+          "name": "students",
+          "type": "link"
+        },
+        {
+          "route": "academic-records",
+          "name": "academic_records",
+          "type": "link"
+        }
+      ]
+    }
+    
+  ]
+}

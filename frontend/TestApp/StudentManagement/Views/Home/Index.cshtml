@@ -1,0 +1,352 @@
+﻿@{
+    ViewData["Title"] = "Students Management";
+}
+
+<style>
+    body { background-color: #f8fafc; }
+    
+    /* Filter Card Styling */
+    .filter-card { 
+        background-color: #ffffff; 
+        border-radius: 12px; 
+        padding: 24px; 
+        margin-bottom: 24px; 
+        border: 1px solid #e2e8f0; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .filter-title {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+    .filter-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+    .custom-input {
+        border-radius: 20px;
+        border: 1px solid #cbd5e1;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        color: #94a3b8;
+    }
+    .custom-input:focus {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+    }
+    .dashed-divider {
+        border-top: 1px dashed #e2e8f0;
+        margin: 20px 0;
+    }
+
+    /* Table & Status Badge Styling */
+    .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .status-active { background-color: #dcfce7; color: #16a34a; }
+    .status-disabled { background-color: #fee2e2; color: #dc2626; }
+    .pagination-container { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; }
+    
+    /* New Button Styling */
+    .btn-action { border-radius: 8px; font-weight: 500; padding: 4px 12px; font-size: 0.85rem; }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="font-weight: 700; color: #0f172a;">Students</h2>
+    </div>
+
+    <div class="filter-card">
+        <div class="d-flex align-items-center filter-title">
+            <i class="bi bi-sliders me-2" style="color: #6366f1;"></i> Filter Students
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label filter-label">Student Name</label>
+                <input type="text" class="form-control custom-input" placeholder="Search by name">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label filter-label">Student ID</label>
+                <input type="text" class="form-control custom-input" placeholder="Search by ID">
+            </div>
+        </div>
+
+        <div class="dashed-divider"></div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label filter-label">Email Address</label>
+                <input type="text" class="form-control custom-input" placeholder="Search by email">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label filter-label">Phone Number</label>
+                <input type="text" class="form-control custom-input" placeholder="Search by phone">
+            </div>
+        </div>
+
+        <div class="dashed-divider"></div>
+
+        <div class="row g-4 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label filter-label">Assessment Status</label>
+                <select class="form-select custom-input">
+                    <option selected>Select status...</option>
+                    <option value="1">Completed</option>
+                    <option value="2">Pending</option>
+                    <option value="3">Failed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label filter-label">Account Status</label>
+                <select class="form-select custom-input">
+                    <option selected>Active</option>
+                    <option value="disabled">Disabled</option>
+                </select>
+            </div>
+            <div class="col-md-2 text-end">
+                <button class="btn btn-primary w-100" style="border-radius: 20px; background-color: #6366f1; border: none;">Apply</button>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background-color: #f8fafc; color: #64748b; font-size: 0.85rem;">
+                        <tr>
+                            <th class="py-3 px-4 border-bottom-0">Student ID</th>
+                            <th class="py-3 px-4 border-bottom-0">Full Name</th>
+                            <th class="py-3 px-4 border-bottom-0">Email</th>
+                            <th class="py-3 px-4 border-bottom-0">Phone Number</th>
+                            <th class="py-3 px-4 border-bottom-0">Status</th>
+                            <th class="py-3 px-4 border-bottom-0">Registration Date</th>
+                            <th class="py-3 px-4 border-bottom-0 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody style="border-top: 1px solid #e2e8f0;">
+                        
+                        <tr>
+                            <td class="px-4">#STU-001</td>
+                            <td class="px-4 fw-medium">Amy Phrodite</td>
+                            <td class="px-4 text-muted">amy.p@example.com</td>
+                            <td class="px-4 text-muted">(123) 456-7890</td>
+                            <td class="px-4"><span class="status-badge status-active">● Active</span></td>
+                            <td class="px-4 text-muted">2024-09-15</td>
+                            <td class="px-4 text-end">
+                                <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-action" data-bs-toggle="modal" data-bs-target="#disableStudentModal">
+                                    <i class="bi bi-slash-circle"></i> Disable
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="px-4">#STU-002</td>
+                            <td class="px-4 fw-medium">Michael Davis</td>
+                            <td class="px-4 text-muted">michael.d@example.com</td>
+                            <td class="px-4 text-muted">(098) 765-4321</td>
+                            <td class="px-4"><span class="status-badge status-disabled">● Disabled</span></td>
+                            <td class="px-4 text-muted">2024-10-01</td>
+                            <td class="px-4 text-end">
+                                <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-action" data-bs-toggle="modal" data-bs-target="#activateStudentModal">
+                                    <i class="bi bi-check-circle"></i> Activate
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr>
+    <td class="px-4">#STU-003</td>
+    <td class="px-4 fw-medium">Sophia Martinez</td>
+    <td class="px-4 text-muted">sophia.m@example.com</td>
+    <td class="px-4 text-muted">(555) 123-9876</td>
+    <td class="px-4"><span class="status-badge status-active">● Active</span></td>
+    <td class="px-4 text-muted">2024-10-05</td>
+    <td class="px-4 text-end">
+        <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+            <i class="bi bi-eye"></i> View
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-action" data-bs-toggle="modal" data-bs-target="#disableStudentModal">
+            <i class="bi bi-slash-circle"></i> Disable
+        </button>
+    </td>
+</tr>
+
+<tr>
+    <td class="px-4">#STU-004</td>
+    <td class="px-4 fw-medium">Daniel Thompson</td>
+    <td class="px-4 text-muted">daniel.t@example.com</td>
+    <td class="px-4 text-muted">(555) 654-3210</td>
+    <td class="px-4"><span class="status-badge status-active">● Active</span></td>
+    <td class="px-4 text-muted">2024-10-08</td>
+    <td class="px-4 text-end">
+        <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+            <i class="bi bi-eye"></i> View
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-action" data-bs-toggle="modal" data-bs-target="#disableStudentModal">
+            <i class="bi bi-slash-circle"></i> Disable
+        </button>
+    </td>
+</tr>
+
+<tr>
+    <td class="px-4">#STU-005</td>
+    <td class="px-4 fw-medium">Olivia Johnson</td>
+    <td class="px-4 text-muted">olivia.j@example.com</td>
+    <td class="px-4 text-muted">(555) 222-3344</td>
+    <td class="px-4"><span class="status-badge status-disabled">● Disabled</span></td>
+    <td class="px-4 text-muted">2024-10-10</td>
+    <td class="px-4 text-end">
+        <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+            <i class="bi bi-eye"></i> View
+        </button>
+        <button type="button" class="btn btn-outline-success btn-action" data-bs-toggle="modal" data-bs-target="#activateStudentModal">
+            <i class="bi bi-check-circle"></i> Activate
+        </button>
+    </td>
+</tr>
+
+<tr>
+    <td class="px-4">#STU-006</td>
+    <td class="px-4 fw-medium">James Anderson</td>
+    <td class="px-4 text-muted">james.a@example.com</td>
+    <td class="px-4 text-muted">(555) 777-8899</td>
+    <td class="px-4"><span class="status-badge status-active">● Active</span></td>
+    <td class="px-4 text-muted">2024-10-12</td>
+    <td class="px-4 text-end">
+        <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+            <i class="bi bi-eye"></i> View
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-action" data-bs-toggle="modal" data-bs-target="#disableStudentModal">
+            <i class="bi bi-slash-circle"></i> Disable
+        </button>
+    </td>
+</tr>
+
+<tr>
+    <td class="px-4">#STU-007</td>
+    <td class="px-4 fw-medium">Emily Carter</td>
+    <td class="px-4 text-muted">emily.c@example.com</td>
+    <td class="px-4 text-muted">(555) 444-1122</td>
+    <td class="px-4"><span class="status-badge status-disabled">● Disabled</span></td>
+    <td class="px-4 text-muted">2024-10-15</td>
+    <td class="px-4 text-end">
+        <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+            <i class="bi bi-eye"></i> View
+        </button>
+        <button type="button" class="btn btn-outline-success btn-action" data-bs-toggle="modal" data-bs-target="#activateStudentModal">
+            <i class="bi bi-check-circle"></i> Activate
+        </button>
+    </td>
+</tr>
+
+<tr>
+    <td class="px-4">#STU-008</td>
+    <td class="px-4 fw-medium">William Brown</td>
+    <td class="px-4 text-muted">william.b@example.com</td>
+    <td class="px-4 text-muted">(555) 999-0001</td>
+    <td class="px-4"><span class="status-badge status-active">● Active</span></td>
+    <td class="px-4 text-muted">2024-10-18</td>
+    <td class="px-4 text-end">
+        <button type="button" class="btn btn-outline-primary btn-action me-2" data-bs-toggle="modal" data-bs-target="#viewStudentModal">
+            <i class="bi bi-eye"></i> View
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-action" data-bs-toggle="modal" data-bs-target="#disableStudentModal">
+            <i class="bi bi-slash-circle"></i> Disable
+        </button>
+    </td>
+</tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card-footer bg-white border-top pagination-container px-4 py-3">
+            <div class="d-flex align-items-center">
+                <span class="me-2 text-muted" style="font-size: 0.9rem;">Rows per page:</span>
+                <select class="form-select form-select-sm custom-input" style="width: 75px; padding-top: 4px; padding-bottom: 4px;">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link rounded-pill px-3 mx-1" href="#">&lt; Previous</a></li>
+                    <li class="page-item active"><a class="page-link rounded-circle mx-1" href="#" style="background-color: #6366f1; border-color: #6366f1;">1</a></li>
+                    <li class="page-item"><a class="page-link rounded-circle mx-1 text-dark" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link rounded-circle mx-1 text-dark" href="#">3</a></li>
+                    <li class="page-item"><span class="page-link border-0 text-muted mx-1">...</span></li>
+                    <li class="page-item"><a class="page-link rounded-circle mx-1 text-dark" href="#">10</a></li>
+                    <li class="page-item"><a class="page-link rounded-pill px-3 mx-1 text-dark" href="#">Next &gt;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none;">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold">Student Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2"><div class="col-5 text-muted">Student ID:</div><div class="col-7 fw-medium">#STU-001</div></div>
+                <div class="row mb-2"><div class="col-5 text-muted">Full Name:</div><div class="col-7 fw-medium">Amy Phrodite</div></div>
+                <div class="row mb-2"><div class="col-5 text-muted">Email:</div><div class="col-7 fw-medium">amy.p@example.com</div></div>
+                <div class="row mb-2"><div class="col-5 text-muted">Phone:</div><div class="col-7 fw-medium">(123) 456-7890</div></div>
+                <div class="row mb-2"><div class="col-5 text-muted">Registration:</div><div class="col-7 fw-medium">2024-09-15</div></div>
+                <div class="row mb-2"><div class="col-5 text-muted">Account Status:</div><div class="col-7"><span class="badge bg-success">Active</span></div></div>
+            </div>
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="disableStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius: 12px; border: none;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Disable Student?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-muted">
+                Are you sure you want to disable this student's account? They will lose access to the system.
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                <button type="button" class="btn btn-danger" style="border-radius: 8px;">Yes, Disable</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="activateStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius: 12px; border: none;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-success">Activate Student?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-muted">
+                Are you sure you want to reactivate this student's account?
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                <button type="button" class="btn btn-success" style="border-radius: 8px;">Yes, Activate</button>
+            </div>
+        </div>
+    </div>
+</div>
