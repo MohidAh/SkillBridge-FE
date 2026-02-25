@@ -292,38 +292,37 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>#STU-001</td>
-            <td class="fw-medium">Amy Phrodite</td>
-            <td class="text-muted">amy.p@example.com</td>
-            <td class="text-muted">(123) 456-7890</td>
-            <td><span class="status-badge status-active">● Active</span></td>
-            <td class="text-muted">2024-09-15</td>
-            <td class="text-end">
-              <button class="btn btn-outline-primary btn-action" (click)="openModal('viewStudentModal')">
-                 View
-              </button>
-              <button class="btn btn-outline-danger btn-action" (click)="openModal('disableStudentModal')">
-                 Disable
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>#STU-002</td>
-            <td class="fw-medium">Michael Davis</td>
-            <td class="text-muted">michael.d@example.com</td>
-            <td class="text-muted">(098) 765-4321</td>
-            <td><span class="status-badge status-disabled">● Disabled</span></td>
-            <td class="text-muted">2024-10-01</td>
-            <td class="text-end">
-              <button class="btn btn-outline-primary btn-action" (click)="openModal('viewStudentModal')">
-                 View
-              </button>
-              <button class="btn btn-outline-success btn-action" (click)="openModal('activateStudentModal')">
-                 Activate
-              </button>
-            </td>
-          </tr>
+          @for (student of students; track student.id) {
+            <tr>
+              <td>{{ student.id }}</td>
+              <td class="fw-medium">{{ student.name }}</td>
+              <td class="text-muted">{{ student.email }}</td>
+              <td class="text-muted">{{ student.phone }}</td>
+              <td>
+                <span class="status-badge" 
+                      [class.status-active]="student.status === 'Active'" 
+                      [class.status-disabled]="student.status === 'Disabled'">
+                  ● {{ student.status }}
+                </span>
+              </td>
+              <td class="text-muted">{{ student.registrationDate }}</td>
+              <td class="text-end">
+                <button class="btn btn-outline-primary btn-action" (click)="openModal('viewStudentModal', student)">
+                   View
+                </button>
+                
+                @if (student.status === 'Active') {
+                  <button class="btn btn-outline-danger btn-action" (click)="openModal('disableStudentModal', student)">
+                     Disable
+                  </button>
+                } @else {
+                  <button class="btn btn-outline-success btn-action" (click)="openModal('activateStudentModal', student)">
+                     Activate
+                  </button>
+                }
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
       
@@ -351,54 +350,67 @@
   </div>
 </div>
 
-<div id="viewStudentModal" class="modal-overlay" (click)="closeOnBackdrop($event, 'viewStudentModal')">
-  <div class="modal-content">
-      <div class="modal-header">
-          <h3 class="fw-bold">Student Details</h3>
-          <button class="close-btn" (click)="closeModal('viewStudentModal')">&times;</button>
-      </div>
-      <div class="modal-body">
-          <div class="detail-row"><div class="detail-label">Student ID:</div><div class="detail-value">#STU-001</div></div>
-          <div class="detail-row"><div class="detail-label">Full Name:</div><div class="detail-value">Amy Phrodite</div></div>
-          <div class="detail-row"><div class="detail-label">Email:</div><div class="detail-value">amy.p@example.com</div></div>
-          <div class="detail-row"><div class="detail-label">Phone:</div><div class="detail-value">(123) 456-7890</div></div>
-          <div class="detail-row"><div class="detail-label">Registration:</div><div class="detail-value">2024-09-15</div></div>
-          <div class="detail-row"><div class="detail-label">Status:</div><div class="detail-value"><span class="status-badge status-active">Active</span></div></div>
-      </div>
-      <div class="modal-footer">
-          <button class="btn btn-light" (click)="closeModal('viewStudentModal')">Close</button>
-      </div>
+@if (activeModal === 'viewStudentModal' && selectedStudent) {
+  <div class="modal-overlay show" (click)="closeOnBackdrop($event)">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="fw-bold">Student Details</h3>
+            <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row"><div class="detail-label">Student ID:</div><div class="detail-value">{{ selectedStudent.id }}</div></div>
+            <div class="detail-row"><div class="detail-label">Full Name:</div><div class="detail-value">{{ selectedStudent.name }}</div></div>
+            <div class="detail-row"><div class="detail-label">Email:</div><div class="detail-value">{{ selectedStudent.email }}</div></div>
+            <div class="detail-row"><div class="detail-label">Phone:</div><div class="detail-value">{{ selectedStudent.phone }}</div></div>
+            <div class="detail-row"><div class="detail-label">Registration:</div><div class="detail-value">{{ selectedStudent.registrationDate }}</div></div>
+            <div class="detail-row">
+              <div class="detail-label">Status:</div>
+              <div class="detail-value">
+                <span class="status-badge" [class.status-active]="selectedStudent.status === 'Active'" [class.status-disabled]="selectedStudent.status === 'Disabled'">
+                  {{ selectedStudent.status }}
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-light" (click)="closeModal()">Close</button>
+        </div>
+    </div>
   </div>
-</div>
+}
 
-<div id="disableStudentModal" class="modal-overlay" (click)="closeOnBackdrop($event, 'disableStudentModal')">
-  <div class="modal-content modal-sm">
-      <div class="modal-header">
-          <h3 class="fw-bold text-danger">Disable Student?</h3>
-          <button class="close-btn" (click)="closeModal('disableStudentModal')">&times;</button>
-      </div>
-      <div class="modal-body text-muted">
-          Are you sure you want to disable this student's account?
-      </div>
-      <div class="modal-footer">
-          <button class="btn btn-light" (click)="closeModal('disableStudentModal')">Cancel</button>
-          <button class="btn btn-danger">Yes, Disable</button>
-      </div>
+@if (activeModal === 'disableStudentModal' && selectedStudent) {
+  <div class="modal-overlay show" (click)="closeOnBackdrop($event)">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h3 class="fw-bold text-danger">Disable Student?</h3>
+            <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body text-muted">
+            Are you sure you want to disable <b>{{ selectedStudent.name }}</b>'s account?
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-light" (click)="closeModal()">Cancel</button>
+            <button class="btn btn-danger" (click)="closeModal()">Yes, Disable</button>
+        </div>
+    </div>
   </div>
-</div>
+}
 
-<div id="activateStudentModal" class="modal-overlay" (click)="closeOnBackdrop($event, 'activateStudentModal')">
-  <div class="modal-content modal-sm">
-      <div class="modal-header">
-          <h3 class="fw-bold text-success">Activate Student?</h3>
-          <button class="close-btn" (click)="closeModal('activateStudentModal')">&times;</button>
-      </div>
-      <div class="modal-body text-muted">
-          Are you sure you want to reactivate this student's account?
-      </div>
-      <div class="modal-footer">
-          <button class="btn btn-light" (click)="closeModal('activateStudentModal')">Cancel</button>
-          <button class="btn btn-success">Yes, Activate</button>
-      </div>
+@if (activeModal === 'activateStudentModal' && selectedStudent) {
+  <div class="modal-overlay show" (click)="closeOnBackdrop($event)">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h3 class="fw-bold text-success">Activate Student?</h3>
+            <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body text-muted">
+            Are you sure you want to reactivate <b>{{ selectedStudent.name }}</b>'s account?
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-light" (click)="closeModal()">Cancel</button>
+            <button class="btn btn-success" (click)="closeModal()">Yes, Activate</button>
+        </div>
+    </div>
   </div>
-</div>
+}

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, inject, Renderer2 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -12,6 +12,16 @@ import { MtxAlertModule } from '@ng-matero/extensions/alert';
 import { MtxProgressModule } from '@ng-matero/extensions/progress';
 import { Subscription } from 'rxjs';
 import { CHARTS, ELEMENT_DATA, MESSAGES, STATS } from './data';
+
+// 1. Professional Data Interface
+export interface Student {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  status: 'Active' | 'Disabled';
+  registrationDate: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -33,61 +43,27 @@ import { CHARTS, ELEMENT_DATA, MESSAGES, STATS } from './data';
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   private readonly ngZone = inject(NgZone);
   private readonly settings = inject(SettingsService);
+  private readonly renderer = inject(Renderer2); // Safe DOM manipulation
 
+  // --- Existing Dashboard Data ---
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   dataSource = ELEMENT_DATA;
-
   messages = MESSAGES;
-
   charts = CHARTS;
   chart1?: ApexCharts;
   chart2?: ApexCharts;
-
   stats = STATS;
-
   notifySubscription = Subscription.EMPTY;
-
   isShowAlert = true;
 
-  introducingItems = [
-    {
-      name: 'Acrodata GUI',
-      description: 'A JSON powered GUI for configurable panels.',
-      link: 'https://github.com/acrodata/gui',
-    },
-    {
-      name: 'Code Editor',
-      description: 'The CodeMirror 6 wrapper for Angular.',
-      link: 'https://github.com/acrodata/code-editor',
-    },
-    {
-      name: 'Watermark',
-      description: 'A watermark component that can prevent deletion.',
-      link: 'https://github.com/acrodata/watermark',
-    },
-    {
-      name: 'RnD Dialog',
-      description: 'Resizable and draggable dialog based on CDK dialog.',
-      link: 'https://github.com/acrodata/rnd-dialog',
-    },
-    {
-      name: 'Gradient Picker',
-      description: 'A powerful and beautiful gradient picker.',
-      link: 'https://github.com/acrodata/gradient-picker',
-    },
-    {
-      name: 'Color Picker',
-      description: 'Another beautiful color picker.',
-      link: 'https://github.com/acrodata/color-picker',
-    },
-    {
-      name: 'NG DnD',
-      description: 'A toolkit for building complex drag and drop and very similar to react-dnd.',
-      link: 'https://github.com/ng-dnd/ng-dnd',
-    },
+  // --- New Student Management Data & State ---
+  students: Student[] = [
+    { id: '#STU-001', name: 'Amy Phrodite', email: 'amy.p@example.com', phone: '(123) 456-7890', status: 'Active', registrationDate: '2024-09-15' },
+    { id: '#STU-002', name: 'Michael Davis', email: 'michael.d@example.com', phone: '(098) 765-4321', status: 'Disabled', registrationDate: '2024-10-01' }
   ];
 
-  introducingItem = this.introducingItems[this.getRandom(0, 6)];
+  activeModal: string | null = null;
+  selectedStudent: Student | null = null;
 
   get isDark() {
     return this.settings.getThemeColor() == 'dark';
@@ -95,8 +71,6 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.notifySubscription = this.settings.notify.subscribe(opts => {
-      console.log(opts);
-
       this.updateCharts();
     });
   }
@@ -107,29 +81,26 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  openModal(modalId: string) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden'; // Prevents background scrolling
+  // --- Professional Modal Logic ---
+  openModal(modalId: string, student: Student) {
+    this.activeModal = modalId;
+    this.selectedStudent = student;
+    this.renderer.setStyle(document.body, 'overflow', 'hidden'); // Prevent background scroll
   }
-}
 
-closeModal(modalId: string) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.remove('show');
-    document.body.style.overflow = 'auto'; // Restores background scrolling
+  closeModal() {
+    this.activeModal = null;
+    this.selectedStudent = null;
+    this.renderer.removeStyle(document.body, 'overflow'); // Restore background scroll
   }
-}
 
-closeOnBackdrop(event: MouseEvent, modalId: string) {
-  // If the user clicks on the dark overlay (not the white box), close the modal
-  const target = event.target as HTMLElement;
-  if (target.id === modalId) {
-    this.closeModal(modalId);
+  closeOnBackdrop(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    // Check if clicked exactly on the overlay background
+    if (target.classList.contains('modal-overlay')) {
+      this.closeModal();
+    }
   }
-}
 
   ngOnDestroy() {
     this.chart1?.destroy();
