@@ -46,11 +46,9 @@ export class Login {
   get username() {
     return this.loginForm.get('username')!;
   }
-
   get password() {
     return this.loginForm.get('password')!;
   }
-
   get rememberMe() {
     return this.loginForm.get('rememberMe')!;
   }
@@ -63,7 +61,14 @@ export class Login {
       .pipe(filter(authenticated => authenticated))
       .subscribe({
         next: () => {
-          this.router.navigateByUrl('/');
+          this.isSubmitting = false;
+          // Redirect to onboarding if profile not yet complete
+          const profileComplete = localStorage.getItem('profileComplete');
+          if (profileComplete === 'false' || profileComplete === null) {
+            this.router.navigateByUrl('/onboarding');
+          } else {
+            this.router.navigateByUrl('/');
+          }
         },
         error: (errorRes: HttpErrorResponse) => {
           if (errorRes.status === 422) {

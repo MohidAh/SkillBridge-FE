@@ -8,6 +8,7 @@ export interface User {
   roles?: any[];
   roleId?: number;
   permissions?: any[];
+  profileComplete?: boolean;
 }
 
 export interface Token {
