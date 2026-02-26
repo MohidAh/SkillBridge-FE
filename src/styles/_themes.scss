@@ -3,16 +3,65 @@
 html {
   color-scheme: light;
 
+  // Use M3 cyan as the closest built-in palette for our teal brand
   @include mat.theme((
     color: (
-      primary: mat.$azure-palette,
+      primary: mat.$cyan-palette,
       tertiary: mat.$blue-palette,
     ),
     typography: Roboto,
     density: 0
   ));
+
+  // Override M3 system color tokens to match the SkillBridge brand palette
+  --mat-sys-primary:             #0f969c;
+  --mat-sys-primary-rgb:         15, 150, 156;
+  --mat-sys-on-primary:          #fff;
+  --mat-sys-primary-container:   #b3e5e8;
+  --mat-sys-on-primary-container:#05161a;
+  --mat-sys-secondary:           #294d61;
+  --mat-sys-on-secondary:        #fff;
+  --mat-sys-secondary-container: #b3c8d7;
+  --mat-sys-on-secondary-container: #05161a;
+  --mat-sys-surface:             #f0f9fa;
+  --mat-sys-on-surface:          #05161a;
+  --mat-sys-surface-variant:     #e0f4f5;
+  --mat-sys-on-surface-variant:  #072e33;
+  --mat-sys-outline:             #0c7075;
+
+  // Surface container variations
+  --mat-sys-surface-container-highest: #e0f4f5;
+  --mat-sys-surface-container-high:    #e7f7f8;
+  --mat-sys-surface-container:         #f0f9fa;
+  --mat-sys-surface-container-low:     #f4fbfc;
+  --mat-sys-surface-container-lowest:  #fff;
 }
 
 .theme-dark {
   color-scheme: dark;
+
+  // Dark mode system token overrides
+  --mat-sys-primary:             #0f969c;
+  --mat-sys-primary-rgb:         15, 150, 156;
+  --mat-sys-on-primary:          #05161a;
+  --mat-sys-primary-container:   #072e33;
+  --mat-sys-on-primary-container:#e0f4f5;
+  --mat-sys-secondary:           #6da5c0;
+  --mat-sys-on-secondary:        #05161a;
+  --mat-sys-secondary-container: #294d61;
+  --mat-sys-on-secondary-container: #e0f4f5;
+  --mat-sys-surface:             #05161a;
+  --mat-sys-on-surface:          #e0f4f5;
+  --mat-sys-surface-variant:     #072e33;
+  --mat-sys-on-surface-variant:  #e0f4f5;
+  --mat-sys-outline:             #0c7075;
+
+  // Surface container variations for dark mode
+  --mat-sys-surface-container-highest: #0c7075;
+  --mat-sys-surface-container-high:    #072e33;
+  --mat-sys-surface-container:         #05161a; // This matches the background
+  --mat-sys-surface-container-low:     #041215;
+  --mat-sys-surface-container-lowest:  #030d0f;
 }
+
+

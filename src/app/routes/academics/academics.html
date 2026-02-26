@@ -2,11 +2,11 @@
   <div class="col-12 p-24">
     <mat-card class="overflow-hidden border-none shadow-lg rounded-xl">
       <mat-card-header
-        class="flex items-center justify-between p-24 bg-white border-b border-slate-100"
+        class="flex items-center justify-between p-24 border-b border-surface-variant"
       >
         <div>
-          <mat-card-title class="text-2xl font-bold text-slate-800">Academics</mat-card-title>
-          <mat-card-subtitle class="text-slate-500 mt-1">
+          <mat-card-title class="text-2xl font-bold">Academics</mat-card-title>
+          <mat-card-subtitle class="text-muted mt-1">
             Your enrolled subjects and progress
           </mat-card-subtitle>
         </div>
@@ -21,21 +21,21 @@
           <table mat-table [dataSource]="dataSource" class="w-full">
             <ng-container matColumnDef="code">
               <th mat-header-cell *matHeaderCellDef class="font-bold">Code</th>
-              <td mat-cell *matCellDef="let item" class="font-medium text-slate-600">
+              <td mat-cell *matCellDef="let item" class="font-medium text-muted">
                 {{ item.code }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="subject">
               <th mat-header-cell *matHeaderCellDef class="font-bold">Subject</th>
-              <td mat-cell *matCellDef="let item" class="text-slate-800 font-semibold">
+              <td mat-cell *matCellDef="let item" class="font-semibold">
                 {{ item.subject }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="semester">
               <th mat-header-cell *matHeaderCellDef class="font-bold">Semester</th>
-              <td mat-cell *matCellDef="let item" class="text-slate-500">
+              <td mat-cell *matCellDef="let item" class="text-muted">
                 {{ item.semester }}
               </td>
             </ng-container>
@@ -43,7 +43,7 @@
             <ng-container matColumnDef="credits">
               <th mat-header-cell *matHeaderCellDef class="font-bold">Credits</th>
               <td mat-cell *matCellDef="let item">
-                <span class="px-8 py-4 bg-slate-100 text-slate-700 rounded-md text-xs font-bold">
+                <span class="px-8 py-4 bg-surface-variant rounded-md text-xs font-bold">
                   {{ item.credits }} CR
                 </span>
               </td>
@@ -78,11 +78,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns"
-              class="hover:bg-slate-50 cursor-default"
-            ></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="cursor-default"></tr>
           </table>
         </div>
       </mat-card-content>
