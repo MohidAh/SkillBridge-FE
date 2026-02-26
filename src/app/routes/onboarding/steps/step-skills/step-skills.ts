@@ -102,4 +102,12 @@ export class StepSkills implements OnInit {
       courseSkills: this.courseSkills,
     });
   }
+
+  skip() {
+    this.saved.emit({
+      skills: [],
+      careerInterests: [],
+      courseSkills: [],
+    });
+  }
 }

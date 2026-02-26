@@ -5,14 +5,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { AcademicInfoPayload, DegreeEntry } from '../../onboarding-api.service';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import {
+  AcademicInfoPayload,
+  DegreeEntry,
+  OnboardingApiService,
+} from '../../onboarding-api.service';
 import { OnboardingService } from '../../onboarding.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-step-academic',
   templateUrl: './step-academic.html',
   styleUrl: './step-academic.scss',
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -28,30 +36,40 @@ export class StepAcademic implements OnInit {
 
   private readonly fb = inject(FormBuilder);
   private readonly onboarding = inject(OnboardingService);
+  private readonly api = inject(OnboardingApiService);
 
-  readonly degreeTypes = [
-    'High School Diploma',
-    'Associate Degree',
-    "Bachelor's Degree",
-    "Master's Degree",
-    'PhD / Doctorate',
-    'Postdoctoral',
-    'Diploma / Certificate',
-    'Other',
+  readonly Object = Object;
+  readonly batches = [
+    { label: '1st Batch/ Year', value: 1 },
+    { label: '2nd Batch/ Year', value: 2 },
+    { label: '3rd Batch/ Year', value: 3 },
+    { label: '4th Batch/ Year', value: 4 },
+    { label: '5th Batch/ Year', value: 5 },
+    { label: '6th Batch/ Year', value: 6 },
   ];
+  readonly educationSystems = ['O Levels', 'A Levels', 'Intermediate', 'Matriculation', 'Other'];
 
-  readonly years = this.buildYearList();
+  isHighSchool = false;
+  institutions$!: Observable<string[]>;
+  degrees$!: Observable<string[]>;
 
   /** List of complete, saved degree entries */
   degrees: DegreeEntry[] = [];
 
   /** Inline "add degree" form */
-  degreeForm = this.fb.nonNullable.group({
-    institution: ['', Validators.required],
-    degree: ['', Validators.required],
-    startYear: ['', Validators.required],
-    endYear: [''], // empty = in progress
-    major: ['', Validators.required],
+  degreeForm = this.fb.group({
+    type: ['university' as 'university' | 'high_school'],
+
+    // High School Fields
+    educationSystem: [''],
+    subjects: [''],
+    grades: [''],
+
+    // University Fields
+    institution: [''],
+    degree: [''],
+    yearBatch: [''],
+    major: [''],
   });
 
   /** File selected for upload */
@@ -61,6 +79,9 @@ export class StepAcademic implements OnInit {
   editingIndex = -1; // -1 = adding new; >=0 = editing existing
 
   ngOnInit() {
+    this.isHighSchool = this.onboarding.snapshot.personalInfo?.educationLevel === 'High School';
+    this.setupFormValidators();
+
     const saved = this.onboarding.snapshot.academicInfo;
     if (saved?.degrees?.length) {
       this.degrees = [...saved.degrees];
@@ -68,11 +89,50 @@ export class StepAcademic implements OnInit {
       // Show form immediately on first visit
       this.showDegreeForm = true;
     }
+
+    this.institutions$ = this.api.getInstitutions();
+
+    // When institution changes, load its optional degrees
+    this.degreeForm.get('institution')?.valueChanges.subscribe(inst => {
+      if (inst) {
+        this.degrees$ = this.api.getDegrees(inst);
+        // Clear degree when institution changes, unless we are editing an existing record
+        if (this.editingIndex === -1 && this.degreeForm.get('degree')?.value) {
+          this.degreeForm.get('degree')?.setValue('');
+        }
+      } else {
+        this.degrees$ = of([]);
+      }
+    });
   }
 
-  private buildYearList(): string[] {
+  private setupFormValidators() {
+    const f = this.degreeForm.controls;
+
+    // Clear all existing validators
+    Object.values(f).forEach(ctrl => {
+      ctrl.clearValidators();
+      ctrl.updateValueAndValidity();
+    });
+
+    if (this.isHighSchool) {
+      f.type.setValue('high_school');
+      f.educationSystem.setValidators(Validators.required);
+      f.subjects.setValidators(Validators.required);
+      f.grades.setValidators(Validators.required);
+    } else {
+      f.type.setValue('university');
+      f.institution.setValidators(Validators.required);
+      f.degree.setValidators(Validators.required);
+      f.yearBatch.setValidators(Validators.required);
+      f.major.setValidators(Validators.required);
+    }
+  }
+
+  private buildBatchList(): string[] {
     const current = new Date().getFullYear();
-    return Array.from({ length: 50 }, (_, i) => String(current - i));
+    // generate e.g: 2024, 2025, 2026, 2027, 2028, 2029
+    return Array.from({ length: 6 }, (_, i) => String(current + i));
   }
 
   // ── File upload ──────────────────────────────────────────────────────────────
@@ -95,11 +155,14 @@ export class StepAcademic implements OnInit {
 
   editDegree(index: number) {
     const d = this.degrees[index];
-    this.degreeForm.setValue({
+    this.degreeForm.patchValue({
+      type: d.type,
+      educationSystem: d.educationSystem,
+      subjects: d.subjects,
+      grades: d.grades,
       institution: d.institution,
       degree: d.degree,
-      startYear: d.startYear,
-      endYear: d.endYear,
+      yearBatch: d.yearBatch,
       major: d.major,
     });
     this.editingIndex = index;
@@ -112,7 +175,22 @@ export class StepAcademic implements OnInit {
       return;
     }
     const v = this.degreeForm.getRawValue();
-    const entry: DegreeEntry = { ...v };
+    const entry: DegreeEntry = {
+      type: this.isHighSchool ? 'high_school' : 'university',
+      ...(this.isHighSchool
+        ? {
+            educationSystem: v.educationSystem || '',
+            subjects: v.subjects || '',
+            grades: v.grades || '',
+          }
+        : {
+            institution: v.institution || '',
+            degree: v.degree || '',
+            yearBatch: v.yearBatch || '',
+            major: v.major || '',
+          }),
+    };
+
     // File URL would be set by BE; locally just store name for display
     if (this.selectedFile) {
       entry.degreeFileUrl = this.selectedFile.name;

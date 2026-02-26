@@ -236,4 +236,15 @@ export class StepPsychology implements OnInit {
       answers: this.questions.map(q => this.answers[q.id] ?? 3),
     });
   }
+
+  skip() {
+    this.saved.emit({
+      openness: 0,
+      conscientiousness: 0,
+      extraversion: 0,
+      agreeableness: 0,
+      neuroticism: 0,
+      answers: [],
+    });
+  }
 }

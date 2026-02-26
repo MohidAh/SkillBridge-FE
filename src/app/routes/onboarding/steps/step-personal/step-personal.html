@@ -59,6 +59,21 @@
       }
     </div>
 
+    <!-- Education Level -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>Education Level</mat-label>
+        <mat-select formControlName="educationLevel">
+          @for (level of educationLevels; track level) {
+            <mat-option [value]="level">{{ level }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('educationLevel')?.invalid && form.get('educationLevel')?.touched) {
+          <mat-error>Education level is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
     <!-- Phone + City row -->
     <div class="form-row two-cols">
       <mat-form-field appearance="outline" class="step-field">
