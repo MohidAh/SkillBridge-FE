@@ -6,6 +6,7 @@
   mat-toolbar {
     width: var(--sidenav-width);
     padding: 0 0.5rem;
+    background: transparent !important;
   }
 
   // Remove redundant padding in the slide toggle

@@ -38,8 +38,8 @@ export class Login {
   isSubmitting = false;
 
   loginForm = this.fb.nonNullable.group({
-    username: ['admin', [Validators.required]],
-    password: ['skillbridge@123', [Validators.required]],
+    username: ['recca0120', [Validators.required]],
+    password: ['password', [Validators.required]],
     rememberMe: [false],
   });
 
