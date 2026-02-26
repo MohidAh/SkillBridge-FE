@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+table {
+  min-width: 720px;
+}
+
+.status-chip {
+  font-size: 12px;
+}
+
+.completed {
+  color: #065f46;
+  background: #d1fae5;
+}
+
+.in-progress {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.upcoming {
+  color: #1e3a8a;
+  background: #dbeafe;
+}

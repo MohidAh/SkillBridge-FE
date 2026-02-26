@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { AuthService, User } from '@core/authentication';
 import { NgxPermissionsService, NgxRolesService } from 'ngx-permissions';
 import { switchMap, tap } from 'rxjs';
+import { UserRole } from '@shared/enums/userRole.enums';
 import { Menu, MenuService } from './menu.service';
 
 @Injectable({
@@ -46,13 +47,27 @@ export class StartupService {
   }
 
   private setPermissions(user: User) {
-    // In a real app, you should get permissions and roles from the user information.
-    const permissions = ['canAdd', 'canDelete', 'canEdit', 'canRead'];
+    const basePermissions = ['canAdd', 'canDelete', 'canEdit', 'canRead'];
+    const rolePermission = this.getRolePermission(user?.roleId);
+    const permissions = rolePermission ? [...basePermissions, rolePermission] : basePermissions;
+
     this.permissonsService.loadPermissions(permissions);
     this.rolesService.flushRoles();
-    this.rolesService.addRoles({ ADMIN: permissions });
+    this.rolesService.addRoles({ ADMIN: ['ADMIN'], USER: ['USER'] });
 
     // Tips: Alternatively you can add permissions with role at the same time.
     // this.rolesService.addRolesWithPermissions({ ADMIN: permissions });
+  }
+
+  private getRolePermission(roleId?: number) {
+    if (roleId === UserRole.Admin) {
+      return 'ADMIN';
+    }
+
+    if (roleId === UserRole.User) {
+      return 'USER';
+    }
+
+    return undefined;
   }
 }
