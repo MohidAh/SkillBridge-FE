@@ -55,26 +55,22 @@ export class OnboardingService {
 
   savePersonalInfo(data: PersonalInfoPayload) {
     this.state$.next({ ...this.snapshot, personalInfo: data });
-    // 🔌 Uncomment when BE is ready:
-    // this.api.savePersonalInfo(data).subscribe();
+    this.api.savePersonalInfo(data).subscribe();
   }
 
   saveAcademicInfo(data: AcademicInfoPayload) {
     this.state$.next({ ...this.snapshot, academicInfo: data });
-    // 🔌 Uncomment when BE is ready:
-    // this.api.saveAcademicInfo(data).subscribe();
+    this.api.saveAcademicInfo(data).subscribe();
   }
 
   saveSkills(data: SkillsPayload) {
     this.state$.next({ ...this.snapshot, skills: data });
-    // 🔌 Uncomment when BE is ready:
-    // this.api.saveSkills(data).subscribe();
+    this.api.saveSkills(data).subscribe();
   }
 
   saveAssessment(data: AssessmentPayload) {
     this.state$.next({ ...this.snapshot, assessment: data });
-    // 🔌 Uncomment when BE is ready:
-    // this.api.submitAssessment(data).subscribe();
+    this.api.submitAssessment(data).subscribe();
   }
 
   markProfileComplete() {

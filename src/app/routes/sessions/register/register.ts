@@ -87,11 +87,15 @@ export class Register {
     // Mark profile as NOT complete — triggers onboarding wizard after login
     localStorage.setItem('profileComplete', 'false');
 
-    // 🔌 Uncomment when BE is ready:
-    // const { fullName, email, password } = this.registerForm.getRawValue();
-    // this.onboardingApi.submitRegistration({ fullName, email, password }).subscribe({ ... });
-
-    this.isSubmitting = false;
-    this.router.navigateByUrl('/auth/login');
+    const { fullName, email, password } = this.registerForm.getRawValue();
+    this.onboardingApi.submitRegistration({ fullName, email, password }).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.router.navigateByUrl('/auth/login');
+      },
+      error: () => {
+        this.isSubmitting = false;
+      },
+    });
   }
 }

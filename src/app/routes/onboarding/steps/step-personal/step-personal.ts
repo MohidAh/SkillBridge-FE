@@ -33,6 +33,7 @@ export class StepPersonal implements OnInit {
   form = this.fb.nonNullable.group({
     dateOfBirth: ['', Validators.required],
     gender: ['', Validators.required],
+    educationLevel: ['', Validators.required],
     phone: ['', Validators.required],
     country: ['', Validators.required],
     city: ['', Validators.required],
@@ -40,6 +41,7 @@ export class StepPersonal implements OnInit {
   });
 
   readonly genders = ['Male', 'Female', 'Prefer not to say'];
+  readonly educationLevels = ['High School', 'University', 'Graduate'];
 
   readonly countries = [
     'Pakistan',
