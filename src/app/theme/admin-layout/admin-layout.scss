@@ -13,6 +13,7 @@
 
   position: absolute;
   overflow-x: hidden;
+  background-color: var(--sidebar-background-color);
   border-width: 0 !important;
   transition-property: transform, width !important;
 }
@@ -31,6 +32,10 @@
     height: 100% !important;
     padding-top: 0.5rem;
   }
+}
+
+.matero-content {
+  background-color: var(--body-background-color);
 }
 
 // Layout control

@@ -6,6 +6,7 @@ import { ajax } from 'rxjs/ajax';
 import { find, map, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { base64, currentTimestamp, filterObject, User } from '@core/authentication';
+import { UserRole } from '@shared/enums/userRole.enums';
 
 class JWT {
   generate(user: User) {
@@ -94,6 +95,7 @@ export class InMemDataService implements InMemoryDbService {
       name: 'Admin',
       email: 'admin@skillbridge.com',
       avatar: 'images/avatar.jpg',
+      roleId: UserRole.Admin,
     },
     {
       id: 2,
@@ -102,6 +104,7 @@ export class InMemDataService implements InMemoryDbService {
       name: 'recca0120',
       email: 'recca0120@gmail.com',
       avatar: 'images/heros/10.jpg',
+      roleId: UserRole.User,
       refresh_token: true,
     },
   ];
