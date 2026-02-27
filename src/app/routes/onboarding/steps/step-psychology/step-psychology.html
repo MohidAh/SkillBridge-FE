@@ -52,6 +52,8 @@
         <mat-icon>arrow_back</mat-icon>
         Back
       </button>
+      <div style="flex: 1"></div>
+      <button type="button" matButton class="btn-skip" (click)="skip()">Skip this step</button>
       <button
         type="button"
         matButton="filled"
@@ -97,6 +99,8 @@
           <mat-icon>arrow_back</mat-icon>
           Retake
         </button>
+        <div style="flex: 1"></div>
+        <button type="button" matButton class="btn-skip" (click)="skip()">Skip</button>
         <button type="button" matButton="filled" class="btn-next btn-finish" (click)="submit()">
           Finish Setup
           <mat-icon>check_circle</mat-icon>

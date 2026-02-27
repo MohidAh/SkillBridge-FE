@@ -143,9 +143,20 @@ export class InMemDataService implements InMemoryDbService {
     return;
   }
 
+  put(reqInfo: RequestInfo) {
+    if (is(reqInfo, 'user/profile') || is(reqInfo, 'user/academic') || is(reqInfo, 'user/skills')) {
+      return this.updateUser(reqInfo);
+    }
+    return;
+  }
+
   post(reqInfo: RequestInfo) {
     if (is(reqInfo, 'auth/login')) {
       return this.login(reqInfo);
+    }
+
+    if (is(reqInfo, 'auth/register')) {
+      return this.register(reqInfo);
     }
 
     if (is(reqInfo, 'auth/refresh')) {
@@ -154,6 +165,10 @@ export class InMemDataService implements InMemoryDbService {
 
     if (is(reqInfo, 'auth/logout')) {
       return this.logout(reqInfo);
+    }
+
+    if (is(reqInfo, 'user/assessment')) {
+      return this.updateUser(reqInfo);
     }
 
     return;
@@ -203,6 +218,59 @@ export class InMemDataService implements InMemoryDbService {
     const { headers, url } = reqInfo;
     const response = { headers, url, status: STATUS.OK, body: {} };
 
+    return reqInfo.utils.createResponse$(() => response);
+  }
+
+  private register(reqInfo: RequestInfo) {
+    const { headers, url } = reqInfo;
+    const req = reqInfo.req as HttpRequest<any>;
+    const { fullName, email, password } = req.body;
+
+    const newUser: User = {
+      id: this.users.length + 1,
+      username: email, // mock logic
+      name: fullName,
+      email,
+      password,
+      roleId: UserRole.User,
+      profileComplete: false,
+    };
+
+    this.users.push(newUser);
+
+    console.log('newUser', newUser);
+
+    const currentUser = Object.assign({}, newUser);
+    delete currentUser['password'];
+
+    // In our app, after register we don't automatically login but we return success
+    const result = { status: STATUS.OK, body: {} };
+    const response = Object.assign({ headers, url }, result);
+    return reqInfo.utils.createResponse$(() => response);
+  }
+
+  private updateUser(reqInfo: RequestInfo) {
+    const { headers, url } = reqInfo;
+    const req = reqInfo.req as HttpRequest<any>;
+    const tokenUser = jwt.getUser(req);
+
+    if (!tokenUser) {
+      const response = { headers, url, status: STATUS.UNAUTHORIZED, body: {} };
+      return reqInfo.utils.createResponse$(() => response);
+    }
+
+    const userIndex = this.users.findIndex(u => u.id === tokenUser.id);
+    if (userIndex > -1) {
+      // Simplistic mock: just merge the request body into the user object
+      this.users[userIndex] = { ...this.users[userIndex], ...req.body };
+
+      // If this is the final assessment, mark profileComplete
+      if (is(reqInfo, 'user/assessment')) {
+        this.users[userIndex].profileComplete = true;
+      }
+    }
+
+    const response = { headers, url, status: STATUS.OK, body: {} };
     return reqInfo.utils.createResponse$(() => response);
   }
 }

@@ -23,6 +23,7 @@ export interface RegistrationPayload {
 export interface PersonalInfoPayload {
   dateOfBirth: string;
   gender: string;
+  educationLevel: string;
   phone: string;
   country: string;
   city: string;
@@ -30,11 +31,18 @@ export interface PersonalInfoPayload {
 }
 
 export interface DegreeEntry {
-  institution: string;
-  degree: string;
-  startYear: string;
-  endYear: string; // empty string = In Progress
-  major: string;
+  type: 'high_school' | 'university';
+
+  // High School Fields
+  educationSystem?: string;
+  subjects?: string;
+  grades?: string;
+
+  // University Fields
+  institution?: string;
+  degree?: string;
+  yearBatch?: string; // <-- Changed from startYear / endYear
+  major?: string;
   degreeFileUrl?: string; // populated when BE is ready
 }
 
@@ -62,47 +70,41 @@ export class OnboardingApiService {
   private readonly http = inject(HttpClient);
 
   submitRegistration(data: RegistrationPayload) {
-    return this.http.post(API.register, data).pipe(
-      catchError(err => {
-        console.warn('[OnboardingAPI] Registration endpoint not yet live:', err.status);
-        return of(null);
-      })
-    );
+    return this.http.post<RegistrationPayload>(API.register, data);
   }
 
   savePersonalInfo(data: PersonalInfoPayload) {
-    return this.http.put(API.personalInfo, data).pipe(
-      catchError(err => {
-        console.warn('[OnboardingAPI] Personal info endpoint not yet live:', err.status);
-        return of(null);
-      })
-    );
+    return this.http.put<PersonalInfoPayload>(API.personalInfo, data);
   }
 
   saveAcademicInfo(data: AcademicInfoPayload) {
-    return this.http.put(API.academicInfo, data).pipe(
-      catchError(err => {
-        console.warn('[OnboardingAPI] Academic info endpoint not yet live:', err.status);
-        return of(null);
-      })
-    );
+    return this.http.put<AcademicInfoPayload>(API.academicInfo, data);
   }
 
   saveSkills(data: SkillsPayload) {
-    return this.http.put(API.skills, data).pipe(
-      catchError(err => {
-        console.warn('[OnboardingAPI] Skills endpoint not yet live:', err.status);
-        return of(null);
-      })
-    );
+    return this.http.put<SkillsPayload>(API.skills, data);
   }
 
   submitAssessment(data: AssessmentPayload) {
-    return this.http.post(API.assessment, data).pipe(
-      catchError(err => {
-        console.warn('[OnboardingAPI] Assessment endpoint not yet live:', err.status);
-        return of(null);
-      })
-    );
+    return this.http.post<AssessmentPayload>(API.assessment, data);
+  }
+
+  getInstitutions() {
+    // 🔌 Mock implementation until BE is ready
+    return of(['FAST-NUCES', 'LUMS', 'NUST', 'IBA', 'NED University', 'COMSATS', 'Other']);
+  }
+
+  getDegrees(institution: string) {
+    // 🔌 Mock implementation until BE is ready
+    // You can populate this conditionally based on institution if needed.
+    return of([
+      'BS Computer Science',
+      'BS Software Engineering',
+      'BBA',
+      'MBA',
+      'MS Computer Science',
+      'PhD Computer Science',
+      'Other',
+    ]);
   }
 }
