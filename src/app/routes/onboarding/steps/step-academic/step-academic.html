@@ -163,7 +163,7 @@
                 <mat-label>Year / Batch</mat-label>
                 <mat-select formControlName="yearBatch">
                   @for (b of batches; track b) {
-                    <mat-option [value]="b">{{ b }}</mat-option>
+                    <mat-option [value]="b.value">{{ b.label }}</mat-option>
                   }
                 </mat-select>
                 @if (degreeForm.get('yearBatch')?.invalid && degreeForm.get('yearBatch')?.touched) {
@@ -175,18 +175,23 @@
 
           <!-- Degree Upload -->
           <div class="form-row">
-            <label class="field-label">
+            <label for="degree-certificate" class="field-label">
               Degree Certificate
               <span class="field-hint">(optional)</span>
             </label>
             <input
+              id="degree-certificate"
               #fileInput
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
               class="file-input-hidden"
               (change)="onFileSelected($event)"
             />
-            <div class="file-upload-area" (click)="triggerFileInput(fileInput)">
+            <div
+              class="file-upload-area"
+              (click)="triggerFileInput(fileInput)"
+              [attr.for]="'degree-certificate'"
+            >
               @if (selectedFile) {
                 <mat-icon class="file-upload-area__icon file-upload-area__icon--ok">
                   check_circle
