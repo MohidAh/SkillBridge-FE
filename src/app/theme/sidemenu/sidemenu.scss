@@ -1,15 +1,16 @@
 @use '@angular/material' as mat;
 
 .matero-sidemenu {
-  padding: 0;
+  padding: 0.5rem;
   margin: 0;
+  overflow: visible !important;
   list-style: none;
 
   .menu-item {
     margin-bottom: 12px;
-    overflow: hidden;
-    border-radius: 1.5rem;
-    transition: background 225ms cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+    border-radius: var(--radius-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .submenu & {
       margin-bottom: 4px;
@@ -21,27 +22,47 @@
       transition: all 225ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    // Hide text and spacing when parent is tiny or being reimagined
     >.menu-heading {
+      padding: 0.5rem 0.75rem;
+      background-color: transparent !important;
+      transition: all 0.3s ease;
+
       &:hover,
       &:focus {
-        background-color: var(--sidemenu-heading-hover-background-color);
+        color: var(--mat-sys-primary);
+
+        .menu-icon {
+          background-color: rgb(15 150 156 / 0.1);
+          transform: scale(1.1);
+        }
       }
     }
 
     &.active {
       >.menu-heading {
-        color: var(--sidemenu-active-heading-text-color);
-        background-color: var(--sidemenu-active-heading-background-color);
+        color: var(--mat-sys-primary) !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+
+        .menu-icon {
+          color: white !important;
+          background-color: var(--mat-sys-primary) !important;
+          box-shadow: 0 8px 20px rgb(15 150 156 / 0.4);
+          transform: scale(1.1);
+        }
 
         &:hover,
         &:focus {
-          background-color: var(--sidemenu-active-heading-hover-background-color);
+          background-color: transparent !important;
+          opacity: 1;
         }
       }
     }
 
     &.expanded {
-      background-color: var(--sidemenu-expanded-background-color);
+      background-color: transparent;
+      border-radius: var(--radius-xl);
 
       >.submenu {
         visibility: visible;
@@ -55,7 +76,12 @@
     }
 
     &:has(.active)>.menu-heading {
-      color: var(--sidemenu-active-heading-text-color);
+      font-weight: 600;
+      color: var(--mat-sys-primary);
+
+      .menu-icon {
+        background-color: rgb(15 150 156 / 0.15);
+      }
     }
   }
 
@@ -63,39 +89,51 @@
     position: relative;
     display: flex;
     align-items: center;
-    width: calc(var(--sidenav-width) - 1rem);
-    padding: 0.75rem;
-    font-size: inherit;
-    color: inherit;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    color: var(--mat-sys-on-surface-variant);
     text-decoration: none;
     cursor: pointer;
     outline: none;
     background-color: transparent;
     border: none;
-    border-radius: 1.5rem;
+    border-radius: var(--radius-lg);
   }
 
   .menu-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-right: 0.75rem;
-    font-size: 1.25rem;
-    line-height: 1.5rem;
+    display: flex !important;
+    visibility: visible !important;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: 0 !important; // Removed absolute margin-right
+    overflow: visible;
+    font-family: 'Material Icons', sans-serif !important;
+    font-size: 1.5rem !important;
+    line-height: 1;
+    color: var(--mat-sys-primary) !important;
     text-align: center;
+    background-color: transparent;
+    border-radius: 1rem;
+    opacity: 1 !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     [dir='rtl'] & {
-      margin-right: 0;
-      margin-left: 0.75rem;
+      margin: 0 !important;
     }
 
     &.submenu-icon {
       position: absolute;
       left: 0.75rem;
+      visibility: visible !important;
       width: 1.5rem;
       height: 1.5rem;
-      font-size: 1rem;
+      font-size: 1.25rem !important;
       line-height: 1.5rem;
-      opacity: 0;
+      color: inherit;
+      opacity: 0.7;
 
       [dir='rtl'] & {
         right: 0.75rem;
@@ -118,14 +156,105 @@
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 500;
     text-align: initial;
   }
 
-  .menu-icon,
   .menu-name,
+  .menu-icon,
   .menu-label,
   .menu-badge {
-    transition: opacity mat.$private-swift-ease-out-duration mat.$private-swift-ease-out-timing-function;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // Handle collapsed state expansion per item
+  .matero-sidenav-collapsed & {
+    .menu-item {
+      .menu-heading {
+        position: relative; // For absolute name
+        justify-content: center !important;
+        height: 60px;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+
+      .menu-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+        margin: 0 !important;
+        transform: translate(-50%, -50%) !important;
+
+        [dir='rtl'] & {
+          right: 50%;
+          left: auto;
+          transform: translate(50%, -50%) !important;
+        }
+      }
+
+      .menu-name {
+        position: absolute !important;
+        left: calc(100% + 20px) !important;
+        z-index: 9999 !important;
+        display: block !important;
+        visibility: hidden !important;
+        width: max-content !important;
+        min-width: 100px;
+        padding: 0.75rem 1.5rem !important;
+        color: white !important;
+        white-space: nowrap !important;
+        pointer-events: none !important;
+        background-color: var(--mat-sys-primary) !important;
+        border-radius: 0.75rem !important;
+        box-shadow: 0 10px 40px rgb(5 22 26 / 0.3) !important;
+        opacity: 0 !important;
+        transform: translateX(-20px) !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+
+        [dir='rtl'] & {
+          right: calc(100% + 15px);
+          left: auto;
+          transform: translateX(15px);
+        }
+
+        &::before {
+          position: absolute;
+          top: 50%;
+          left: -6px;
+          content: '';
+          border-color: transparent var(--mat-sys-primary) transparent transparent;
+          border-style: solid;
+          border-width: 6px 6px 6px 0;
+          transform: translateY(-50%);
+
+          [dir='rtl'] & {
+            right: -6px;
+            left: auto;
+            border-color: transparent transparent transparent var(--mat-sys-primary);
+            border-width: 6px 0 6px 6px;
+          }
+        }
+      }
+
+      &:hover {
+        .menu-name {
+          visibility: visible !important;
+          opacity: 1 !important;
+          transform: translateX(0) !important;
+        }
+      }
+
+      &.active {
+        .menu-icon {
+          transform: translate(-50%, -50%) scale(1.1) !important;
+
+          [dir='rtl'] & {
+            transform: translate(50%, -50%) scale(1.1) !important;
+          }
+        }
+      }
+    }
   }
 
   .menu-label,

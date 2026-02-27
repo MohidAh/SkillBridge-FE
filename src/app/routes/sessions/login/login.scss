@@ -18,7 +18,7 @@
   width: 100%;
   min-height: 100vh;
   overflow: hidden;
-  background: radial-gradient(ellipse at 60% 30%, #072e33 0%, #05161a 70%);
+  background: var(--mat-sys-surface);
 
   // Subtle grid overlay
   &::before {
@@ -27,9 +27,21 @@
     pointer-events: none;
     content: '';
     background-image:
-      linear-gradient(rgb(15 150 156 / 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(15 150 156 / 0.04) 1px, transparent 1px);
+      linear-gradient(rgb(from var(--mat-sys-primary) r g b / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(from var(--mat-sys-primary) r g b / 0.04) 1px, transparent 1px);
     background-size: 40px 40px;
+  }
+
+  // Soft light-mode mesh background
+  &::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    content: '';
+    background:
+      radial-gradient(at 0% 0%, rgb(from var(--mat-sys-primary) r g b / 0.05) 0%, transparent 50%),
+      radial-gradient(at 100% 100%, rgb(from var(--mat-sys-primary) r g b / 0.05) 0%, transparent 50%);
   }
 }
 
@@ -41,7 +53,7 @@
   width: 600px;
   height: 600px;
   pointer-events: none;
-  background: radial-gradient(circle, rgb(15 150 156 / 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgb(from var(--mat-sys-primary) r g b / 0.1) 0%, transparent 70%);
   border-radius: 50%;
   animation: pulse-glow 4s ease-in-out infinite;
 }
@@ -84,15 +96,15 @@
     justify-content: center;
     width: 44px;
     height: 44px;
-    background-color: rgb(15 150 156 / 0.12);
-    border: 1px solid rgb(15 150 156 / 0.3);
+    background-color: var(--mat-sys-surface-container);
+    border: 1px solid var(--mat-sys-outline);
     border-radius: 12px;
   }
 
   &__name {
     font-size: 1.375rem;
     font-weight: 700;
-    color: #e0f4f5;
+    color: var(--mat-sys-on-surface);
     letter-spacing: -0.02em;
   }
 }
@@ -101,13 +113,10 @@
 .login-card {
   width: 100%;
   padding: 36px 32px;
-  background: rgb(7 46 51 / 0.6);
-  border: 1px solid rgb(12 112 117 / 0.4);
-  border-radius: 20px;
-  box-shadow:
-    0 0 0 1px rgb(15 150 156 / 0.08),
-    0 24px 48px rgb(5 22 26 / 0.4),
-    inset 0 1px 0 rgb(109 165 192 / 0.12);
+  background: var(--mat-sys-surface-container-high);
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 24px;
+  box-shadow: var(--shadow-premium);
   backdrop-filter: blur(16px);
   animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 
@@ -120,14 +129,14 @@
     margin: 0 0 6px;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #e0f4f5;
+    color: var(--mat-sys-on-surface);
     letter-spacing: -0.01em;
   }
 
   &__subtitle {
     margin: 0;
     font-size: 0.875rem;
-    color: rgb(109 165 192 / 0.8);
+    color: var(--mat-sys-on-surface-variant);
   }
 
   &__content {
@@ -151,7 +160,7 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .form-group {
@@ -165,21 +174,22 @@
   // Label color
   .mat-mdc-form-field-label,
   .mdc-floating-label {
-    color: rgb(109 165 192 / 0.75) !important;
+    color: var(--mat-sys-on-surface-variant) !important;
   }
 
   // Input text
   input.mat-mdc-input-element {
-    color: #e0f4f5 !important;
-    caret-color: #0f969c;
+    color: var(--mat-sys-on-surface) !important;
+    caret-color: var(--mat-sys-primary);
   }
 
   // Outline border (idle)
   .mdc-notched-outline__leading,
   .mdc-notched-outline__notch,
   .mdc-notched-outline__trailing {
-    background-color: rgb(5 22 26 / 0.35);
-    border-color: rgb(12 112 117 / 0.5) !important;
+    background-color: var(--mat-sys-surface-container-low);
+    border-color: var(--mat-sys-outline) !important;
+    transition: all 0.2s ease;
   }
 
   // Focused outline
@@ -187,28 +197,19 @@
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
-      border-color: #0f969c !important;
+      border-color: var(--mat-sys-primary) !important;
       border-width: 2px !important;
     }
 
     .mdc-floating-label,
     .mat-mdc-form-field-label {
-      color: #0f969c !important;
-    }
-  }
-
-  // Error state
-  &.mat-form-field-invalid {
-    .mdc-notched-outline__leading,
-    .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing {
-      border-color: #dc2626 !important;
+      color: var(--mat-sys-primary) !important;
     }
   }
 
   // Error text
   .mat-mdc-form-field-error {
-    color: #fca5a5;
+    color: var(--mat-sys-error, #ba1a1a);
   }
 }
 
@@ -216,16 +217,11 @@
 .login-checkbox {
   margin: 4px 0 12px;
   font-size: 0.875rem;
-  color: rgb(109 165 192 / 0.8);
-
-  // Checkbox border & fill
-  .mdc-checkbox__background {
-    border-color: rgb(12 112 117 / 0.6) !important;
-  }
+  color: var(--mat-sys-on-surface-variant);
 
   &.mat-mdc-checkbox-checked .mdc-checkbox__background {
-    background-color: #0f969c !important;
-    border-color: #0f969c !important;
+    background-color: var(--mat-sys-primary) !important;
+    border-color: var(--mat-sys-primary) !important;
   }
 }
 
@@ -251,9 +247,9 @@
   &:hover:not([disabled]) {
     background: linear-gradient(135deg, #26b0b8 0%, #0f969c 100%);
     box-shadow:
-      0 8px 20px rgb(15 150 156 / 0.4),
-      inset 0 1px 0 rgb(255 255 255 / 0.15);
-    transform: translateY(-1px);
+      0 12px 28px rgb(15 150 156 / 0.45),
+      inset 0 1px 0 rgb(255 255 255 / 0.2);
+    transform: translateY(-2px);
   }
 
   &:active:not([disabled]) {

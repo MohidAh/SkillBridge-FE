@@ -4,14 +4,13 @@
       "route": "dashboard",
       "name": "dashboard",
       "type": "link",
-      "icon": "dashboard",
-      "permissions": {
-        "only": ["ADMIN"]
-      },
-      "badge": {
-        "color": "red-50",
-        "value": "5"
-      }
+      "icon": "dashboard"
+    },
+    {
+      "route": "profile/overview",
+      "name": "profile",
+      "type": "link",
+      "icon": "account_circle"
     },
     {
       "route": "academics",
