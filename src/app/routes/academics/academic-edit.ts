@@ -76,19 +76,8 @@ import { AuthService } from '@core';
           </div>
 
           @if (isHighSchool) {
-            <!-- Grades / Percentage -->
-            <div class="col-md-6 m-b-16">
-              <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Grades / Percentage</mat-label>
-                <input matInput formControlName="grades" placeholder="e.g. A Grade, 85%" />
-                @if (form.get('grades')?.invalid && form.get('grades')?.touched) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-            </div>
-
             <!-- Education System -->
-            <div class="col-md-6 m-b-16">
+            <div class="col-md-12 m-b-16">
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Education System</mat-label>
                 <mat-select formControlName="educationSystem">
@@ -261,7 +250,6 @@ export class AcademicEdit implements OnInit {
     degree: [this.data?.degree || '', Validators.required],
     yearBatch: [this.data?.yearBatch || '', Validators.required],
     major: [this.data?.major || ''],
-    grades: [this.data?.grades || ''],
     educationSystem: [this.data?.educationSystem || ''],
     type: [this.data?.type || 'university'],
   });
@@ -274,13 +262,11 @@ export class AcademicEdit implements OnInit {
 
     if (this.isHighSchool) {
       if (!this.data) this.form.get('type')?.setValue('high_school');
-      this.form.get('grades')?.setValidators(Validators.required);
       this.form.get('educationSystem')?.setValidators(Validators.required);
       this.form.get('major')?.clearValidators();
     } else {
       if (!this.data) this.form.get('type')?.setValue('university');
       this.form.get('major')?.setValidators(Validators.required);
-      this.form.get('grades')?.clearValidators();
       this.form.get('educationSystem')?.clearValidators();
     }
     this.form.updateValueAndValidity();

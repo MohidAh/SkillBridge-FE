@@ -91,7 +91,16 @@ export class OnboardingApiService {
 
   getInstitutions() {
     // 🔌 Mock implementation until BE is ready
-    return of(['FAST-NUCES', 'LUMS', 'NUST', 'IBA', 'NED University', 'COMSATS', 'Other']);
+    return of([
+      'FAST-NUCES',
+      'LUMS',
+      'NUST',
+      'IBA',
+      'NED University',
+      'COMSATS',
+      'Sir Syed University of Engineering and Technology',
+      'Other',
+    ]);
   }
 
   getDegrees(institution: string) {
@@ -100,6 +109,7 @@ export class OnboardingApiService {
     return of([
       'BS Computer Science',
       'BS Software Engineering',
+      'BS Computer Engineering',
       'BBA',
       'MBA',
       'MS Computer Science',
