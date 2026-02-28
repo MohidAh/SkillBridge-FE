@@ -63,8 +63,8 @@ export class Login {
         next: () => {
           this.isSubmitting = false;
           // Redirect to onboarding if profile not yet complete
-          const profileComplete = localStorage.getItem('profileComplete');
-          if (profileComplete === 'false' || profileComplete === null) {
+          const profileComplete = this.auth.getUserSnapshot()?.['profileComplete'];
+          if (!profileComplete) {
             this.router.navigateByUrl('/onboarding');
           } else {
             this.router.navigateByUrl('/');

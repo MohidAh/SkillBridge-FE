@@ -40,12 +40,16 @@ export class StepAcademic implements OnInit {
 
   readonly Object = Object;
   readonly batches = [
-    { label: '1st Batch/ Year', value: 1 },
-    { label: '2nd Batch/ Year', value: 2 },
-    { label: '3rd Batch/ Year', value: 3 },
-    { label: '4th Batch/ Year', value: 4 },
-    { label: '5th Batch/ Year', value: 5 },
-    { label: '6th Batch/ Year', value: 6 },
+    { label: '1st Year', value: 1 },
+    { label: '2nd Year', value: 2 },
+    { label: '3rd Year', value: 3 },
+    { label: '4th Year', value: 4 },
+    { label: '5th Year', value: 5 },
+    { label: '6th Year', value: 6 },
+  ];
+  readonly highSchoolYears = [
+    { label: '1st Year', value: 1 },
+    { label: '2nd Year', value: 2 },
   ];
   readonly educationSystems = ['O Levels', 'A Levels', 'Intermediate', 'Matriculation', 'Other'];
 
@@ -118,7 +122,9 @@ export class StepAcademic implements OnInit {
     if (this.isHighSchool) {
       f.type.setValue('high_school');
       f.educationSystem.setValidators(Validators.required);
-      f.subjects.setValidators(Validators.required);
+      f.institution.setValidators(Validators.required);
+      f.degree.setValidators(Validators.required);
+      f.yearBatch.setValidators(Validators.required);
       f.grades.setValidators(Validators.required);
     } else {
       f.type.setValue('university');
@@ -180,7 +186,9 @@ export class StepAcademic implements OnInit {
       ...(this.isHighSchool
         ? {
             educationSystem: v.educationSystem || '',
-            subjects: v.subjects || '',
+            institution: v.institution || '',
+            degree: v.degree || '',
+            yearBatch: v.yearBatch || '',
             grades: v.grades || '',
           }
         : {
