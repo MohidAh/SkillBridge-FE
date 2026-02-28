@@ -4,10 +4,21 @@
       "route": "dashboard",
       "name": "dashboard",
       "type": "link",
-      "icon": "dashboard",
-      "badge": {
-        "color": "red-50",
-        "value": "5"
+      "icon": "dashboard"
+    },
+    {
+      "route": "profile/overview",
+      "name": "profile",
+      "type": "link",
+      "icon": "account_circle"
+    },
+    {
+      "route": "academics",
+      "name": "academics",
+      "type": "link",
+      "icon": "school",
+      "permissions": {
+        "only": ["USER"]
       }
     },
     {
@@ -15,6 +26,9 @@
       "name": "manage_students",
       "type": "sub",
       "icon": "people",
+      "permissions": {
+        "only": ["ADMIN"]
+      },
       "children": [
         {
           "route": "students",
@@ -28,6 +42,5 @@
         }
       ]
     }
-    
   ]
 }

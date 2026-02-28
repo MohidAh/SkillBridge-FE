@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
@@ -9,7 +10,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     class: 'matero-sidebar-notice',
   },
   encapsulation: ViewEncapsulation.None,
-  imports: [MatTabsModule],
+  imports: [MatTabsModule, MatIconModule],
 })
 export class SidebarNotice {
   tabs = [
@@ -17,20 +18,20 @@ export class SidebarNotice {
       label: 'Today',
       messages: [
         {
-          icon: '🔔',
-          color: 'bg-red-95',
+          icon: 'notifications_active',
+          color: 'bg-primary',
           title: 'General Meeting for update',
           content: `You can use the Dashboard to explore how many new users download reports daily and monthly.`,
         },
         {
-          icon: '📢',
-          color: 'bg-azure-95',
+          icon: 'announcement',
+          color: 'bg-accent',
           title: 'Widgets update',
           content: `We've made some updates to the emendable widget which we think you are going to love.`,
         },
         {
-          icon: '⏳',
-          color: 'bg-violet-95',
+          icon: 'hourglass_empty',
+          color: 'bg-warn',
           title: 'Coming soon new features',
           content: `More new features are coming soon, so stay patient!`,
         },
@@ -40,8 +41,8 @@ export class SidebarNotice {
       label: 'Notifications',
       messages: [
         {
-          icon: '📩',
-          color: 'bg-magenta-95',
+          icon: 'mail',
+          color: 'bg-primary',
           title: 'Weekly reports are available',
           content: `Please go to the notification center to check your reports.`,
         },

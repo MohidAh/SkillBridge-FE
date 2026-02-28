@@ -1,0 +1,90 @@
+﻿<div class="academics-container">
+  <page-header
+    title="Academics"
+    subtitle="Manage your academic records and track your educational progress"
+    [hideBreadcrumb]="true"
+  >
+    <div actions>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="add()"
+        class="add-btn hvr-lift"
+        [disabled]="isLoading()"
+      >
+        <mat-icon>add</mat-icon>
+        Add Record
+      </button>
+    </div>
+  </page-header>
+
+  <div class="academics-content grow d-flex flex-column">
+    @if (isLoading()) {
+      <div class="subjects-grid">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="subject-card-wrapper">
+            <mat-card class="subject-card skeleton">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line m-t-16"></div>
+              <div class="skeleton-line short m-t-8"></div>
+            </mat-card>
+          </div>
+        }
+      </div>
+    } @else if (dataSource().length === 0) {
+      <div class="empty-state hvr-glow">
+        <div class="empty-icon-wrapper">
+          <mat-icon>history_edu</mat-icon>
+        </div>
+        <h3 class="empty-title">No Academic Records</h3>
+        <p class="empty-subtitle">
+          Your academic history is currently empty. Start building your profile by adding your
+          latest educational record.
+        </p>
+        <button mat-flat-button color="primary" (click)="add()" class="hvr-lift mt-button">
+          <mat-icon class="m-r-8">add</mat-icon>
+          Add My First Record
+        </button>
+      </div>
+    } @else {
+      <div class="subjects-grid">
+        @for (item of dataSource(); track item.institution) {
+          <div class="subject-card-wrapper">
+            <mat-card class="subject-card hvr-lift">
+              <mat-card-header>
+                <div class="card-top-row">
+                  <span class="subject-code">
+                    {{ item.yearBatch ? item.yearBatch + ' Year/Batch' : '' }}
+                  </span>
+                  <mat-chip class="status-badge university">
+                    {{ item.type === 'university' ? 'University' : 'High School' }}
+                  </mat-chip>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content class="m-t-16">
+                <h3 class="subject-title">{{ item.degree }}</h3>
+                <div class="institution-info m-b-12">
+                  <mat-icon>school</mat-icon>
+                  <span>{{ item.institution }}</span>
+                </div>
+                @if (item.major) {
+                  <div class="major-info">
+                    <span class="text-muted">Major:</span>
+                    <span>{{ item.major }}</span>
+                  </div>
+                }
+              </mat-card-content>
+
+              <mat-card-actions align="end" class="p-16">
+                <button mat-icon-button (click)="edit(item)" title="Edit Record" class="edit-btn">
+                  <mat-icon>edit_note</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
