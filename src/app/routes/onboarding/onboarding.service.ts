@@ -66,7 +66,11 @@ export class OnboardingService {
 
   saveAcademicInfo(data: AcademicInfoPayload) {
     this.state$.next({ ...this.snapshot, academicInfo: data });
-    this.api.saveAcademicInfo(data).subscribe();
+
+    const currentUser = this.auth.getUserSnapshot();
+    const updatedUser = { ...currentUser, ...data };
+
+    this.auth.setUser(updatedUser);
   }
 
   saveSkills(data: SkillsPayload) {
