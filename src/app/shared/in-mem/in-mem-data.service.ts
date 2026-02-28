@@ -116,7 +116,6 @@ export class InMemDataService implements InMemoryDbService {
       bio: 'Passionate software engineering student with a focus on full-stack development and UX design.',
       degrees: [
         {
-          type: 'university',
           institution: 'FAST-NUCES',
           degree: 'BS Computer Science',
           yearBatch: 4,

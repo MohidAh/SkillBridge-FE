@@ -20,7 +20,9 @@
                 {{ deg.institution }}
               </span>
               <div class="degree-card__meta">
-                <span class="degree-card__tag">{{ isHighSchool ? deg.grades : deg.major }}</span>
+                <span class="degree-card__tag">
+                  {{ isHighSchool ? deg.educationSystem : deg.major }}
+                </span>
                 <span class="degree-card__tag">Year: {{ deg.yearBatch }}</span>
                 @if (deg.degreeFileUrl) {
                   <span class="degree-card__tag degree-card__tag--file">
@@ -132,17 +134,8 @@
             </mat-form-field>
           </div>
 
-          <div class="form-row two-cols">
+          <div class="form-row">
             @if (isHighSchool) {
-              <!-- Grades -->
-              <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Grades / Percentage</mat-label>
-                <input matInput formControlName="grades" placeholder="e.g. A Grade, 85%" />
-                @if (degreeForm.get('grades')?.invalid && degreeForm.get('grades')?.touched) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-
               <!-- Education System -->
               <mat-form-field appearance="outline" class="step-field">
                 <mat-label>Education System</mat-label>

@@ -125,7 +125,6 @@ export class StepAcademic implements OnInit {
       f.institution.setValidators(Validators.required);
       f.degree.setValidators(Validators.required);
       f.yearBatch.setValidators(Validators.required);
-      f.grades.setValidators(Validators.required);
     } else {
       f.type.setValue('university');
       f.institution.setValidators(Validators.required);
@@ -189,7 +188,6 @@ export class StepAcademic implements OnInit {
             institution: v.institution || '',
             degree: v.degree || '',
             yearBatch: v.yearBatch || '',
-            grades: v.grades || '',
           }
         : {
             institution: v.institution || '',
