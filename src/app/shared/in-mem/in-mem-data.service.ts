@@ -119,7 +119,7 @@ export class InMemDataService implements InMemoryDbService {
           type: 'university',
           institution: 'FAST-NUCES',
           degree: 'BS Computer Science',
-          yearBatch: '2026',
+          yearBatch: 4,
           major: 'Software Engineering',
         },
       ],

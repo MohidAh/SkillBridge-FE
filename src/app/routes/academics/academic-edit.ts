@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { OnboardingApiService } from '../onboarding/onboarding-api.service';
 import { Observable, of } from 'rxjs';
+import { AuthService } from '@core';
 
 @Component({
   selector: 'app-academic-edit',
@@ -20,7 +21,9 @@ import { Observable, of } from 'rxjs';
           <!-- Institution / University -->
           <div class="col-12 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Institution / University</mat-label>
+              <mat-label>
+                {{ isHighSchool ? 'Institution / School' : 'Institution / University' }}
+              </mat-label>
               <mat-select formControlName="institution">
                 @for (inst of institutions$ | async; track inst) {
                   <mat-option [value]="inst">{{ inst }}</mat-option>
@@ -35,35 +38,34 @@ import { Observable, of } from 'rxjs';
           <!-- Degree -->
           <div class="col-md-6 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Degree</mat-label>
-              <mat-select formControlName="degree">
-                @for (d of degrees$ | async; track d) {
-                  <mat-option [value]="d">{{ d }}</mat-option>
-                }
-              </mat-select>
+              <mat-label>{{ isHighSchool ? 'Degree / Certificate' : 'Degree' }}</mat-label>
+              @if (isHighSchool) {
+                <mat-select formControlName="degree">
+                  <mat-option value="Matriculation">Matriculation</mat-option>
+                  <mat-option value="Intermediate">Intermediate</mat-option>
+                  <mat-option value="O Levels">O Levels</mat-option>
+                  <mat-option value="A Levels">A Levels</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              } @else {
+                <mat-select formControlName="degree">
+                  @for (d of degrees$ | async; track d) {
+                    <mat-option [value]="d">{{ d }}</mat-option>
+                  }
+                </mat-select>
+              }
               @if (form.get('degree')?.invalid && form.get('degree')?.touched) {
                 <mat-error>Required</mat-error>
               }
             </mat-form-field>
           </div>
 
-          <!-- Major / Field of Study -->
+          <!-- Year -->
           <div class="col-md-6 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Major / Field of Study</mat-label>
-              <input matInput formControlName="major" placeholder="e.g. Computer Science" />
-              @if (form.get('major')?.invalid && form.get('major')?.touched) {
-                <mat-error>Required</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Year / Batch -->
-          <div class="col-md-6 m-b-16">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Year / Batch</mat-label>
+              <mat-label>Year</mat-label>
               <mat-select formControlName="yearBatch">
-                @for (b of batches; track b.value) {
+                @for (b of isHighSchool ? highSchoolYears : batches; track b.value) {
                   <mat-option [value]="b.value">{{ b.label }}</mat-option>
                 }
               </mat-select>
@@ -72,6 +74,45 @@ import { Observable, of } from 'rxjs';
               }
             </mat-form-field>
           </div>
+
+          @if (isHighSchool) {
+            <!-- Grades / Percentage -->
+            <div class="col-md-6 m-b-16">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Grades / Percentage</mat-label>
+                <input matInput formControlName="grades" placeholder="e.g. A Grade, 85%" />
+                @if (form.get('grades')?.invalid && form.get('grades')?.touched) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <!-- Education System -->
+            <div class="col-md-6 m-b-16">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Education System</mat-label>
+                <mat-select formControlName="educationSystem">
+                  @for (es of educationSystems; track es) {
+                    <mat-option [value]="es">{{ es }}</mat-option>
+                  }
+                </mat-select>
+                @if (form.get('educationSystem')?.invalid && form.get('educationSystem')?.touched) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          } @else {
+            <!-- Major / Field of Study -->
+            <div class="col-md-12 m-b-16">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Major / Field of Study</mat-label>
+                <input matInput formControlName="major" placeholder="e.g. Computer Science" />
+                @if (form.get('major')?.invalid && form.get('major')?.touched) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          }
 
           <!-- File Upload -->
           <div class="col-12 m-b-16">
@@ -189,19 +230,29 @@ export class AcademicEdit implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<AcademicEdit>);
   private readonly api = inject(OnboardingApiService);
+  private readonly auth = inject(AuthService);
   readonly data = inject(MAT_DIALOG_DATA);
 
   institutions$!: Observable<string[]>;
   degrees$!: Observable<string[]>;
 
   readonly batches = [
-    { label: '1st Batch/ Year', value: '1' },
-    { label: '2nd Batch/ Year', value: '2' },
-    { label: '3rd Batch/ Year', value: '3' },
-    { label: '4th Batch/ Year', value: '4' },
-    { label: '5th Batch/ Year', value: '5' },
-    { label: '6th Batch/ Year', value: '6' },
+    { label: '1st Year', value: '1' },
+    { label: '2nd Year', value: '2' },
+    { label: '3rd Year', value: '3' },
+    { label: '4th Year', value: '4' },
+    { label: '5th Year', value: '5' },
+    { label: '6th Year', value: '6' },
   ];
+
+  readonly highSchoolYears = [
+    { label: '1st Year', value: '1' },
+    { label: '2nd Year', value: '2' },
+  ];
+
+  readonly educationSystems = ['O Levels', 'A Levels', 'Intermediate', 'Matriculation', 'Other'];
+
+  isHighSchool = false;
 
   selectedFileName: string | null = this.data?.degreeFileUrl || null;
 
@@ -209,11 +260,31 @@ export class AcademicEdit implements OnInit {
     institution: [this.data?.institution || '', Validators.required],
     degree: [this.data?.degree || '', Validators.required],
     yearBatch: [this.data?.yearBatch || '', Validators.required],
-    major: [this.data?.major || '', Validators.required],
+    major: [this.data?.major || ''],
+    grades: [this.data?.grades || ''],
+    educationSystem: [this.data?.educationSystem || ''],
     type: [this.data?.type || 'university'],
   });
 
   ngOnInit() {
+    // Determine if high school based on data or user profile
+    const user = this.auth.getUserSnapshot();
+    this.isHighSchool =
+      this.data?.type === 'high_school' || user?.['personalInfo']?.educationLevel === 'High School';
+
+    if (this.isHighSchool) {
+      if (!this.data) this.form.get('type')?.setValue('high_school');
+      this.form.get('grades')?.setValidators(Validators.required);
+      this.form.get('educationSystem')?.setValidators(Validators.required);
+      this.form.get('major')?.clearValidators();
+    } else {
+      if (!this.data) this.form.get('type')?.setValue('university');
+      this.form.get('major')?.setValidators(Validators.required);
+      this.form.get('grades')?.clearValidators();
+      this.form.get('educationSystem')?.clearValidators();
+    }
+    this.form.updateValueAndValidity();
+
     this.institutions$ = this.api.getInstitutions();
 
     // Handle dependent degree select

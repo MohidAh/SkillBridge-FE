@@ -14,16 +14,14 @@
             <div class="degree-card__icon">🏛️</div>
             <div class="degree-card__body">
               <span class="degree-card__program">
-                {{ isHighSchool ? deg.educationSystem : deg.degree }}
+                {{ deg.degree }}
               </span>
               <span class="degree-card__institution">
-                {{ isHighSchool ? deg.subjects : deg.institution }}
+                {{ deg.institution }}
               </span>
               <div class="degree-card__meta">
                 <span class="degree-card__tag">{{ isHighSchool ? deg.grades : deg.major }}</span>
-                @if (!isHighSchool) {
-                  <span class="degree-card__tag">Batch: {{ deg.yearBatch }}</span>
-                }
+                <span class="degree-card__tag">Year: {{ deg.yearBatch }}</span>
                 @if (deg.degreeFileUrl) {
                   <span class="degree-card__tag degree-card__tag--file">
                     <mat-icon style="font-size: 13px; width: 13px; height: 13px">
@@ -77,9 +75,75 @@
         </div>
 
         <form [formGroup]="degreeForm" class="step-form" style="gap: 6px">
-          @if (isHighSchool) {
-            <!-- High School Fields -->
-            <div class="form-row">
+          <!-- Institution / School -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="step-field">
+              <mat-label>
+                {{ isHighSchool ? 'Institution / School' : 'Institution / University' }}
+              </mat-label>
+              <mat-select formControlName="institution">
+                @for (inst of institutions$ | async; track inst) {
+                  <mat-option [value]="inst">{{ inst }}</mat-option>
+                }
+              </mat-select>
+              @if (
+                degreeForm.get('institution')?.invalid && degreeForm.get('institution')?.touched
+              ) {
+                <mat-error>Required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row two-cols">
+            <!-- Degree / Certificate -->
+            <mat-form-field appearance="outline" class="step-field">
+              <mat-label>{{ isHighSchool ? 'Degree / Certificate' : 'Degree' }}</mat-label>
+              @if (isHighSchool) {
+                <mat-select formControlName="degree">
+                  <mat-option value="Matriculation">Matriculation</mat-option>
+                  <mat-option value="Intermediate">Intermediate</mat-option>
+                  <mat-option value="O Levels">O Levels</mat-option>
+                  <mat-option value="A Levels">A Levels</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              } @else {
+                <mat-select formControlName="degree">
+                  @for (d of degrees$ | async; track d) {
+                    <mat-option [value]="d">{{ d }}</mat-option>
+                  }
+                </mat-select>
+              }
+              @if (degreeForm.get('degree')?.invalid && degreeForm.get('degree')?.touched) {
+                <mat-error>Required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Year -->
+            <mat-form-field appearance="outline" class="step-field">
+              <mat-label>Year</mat-label>
+              <mat-select formControlName="yearBatch">
+                @for (b of isHighSchool ? highSchoolYears : batches; track b) {
+                  <mat-option [value]="b.value">{{ b.label }}</mat-option>
+                }
+              </mat-select>
+              @if (degreeForm.get('yearBatch')?.invalid && degreeForm.get('yearBatch')?.touched) {
+                <mat-error>Required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row two-cols">
+            @if (isHighSchool) {
+              <!-- Grades -->
+              <mat-form-field appearance="outline" class="step-field">
+                <mat-label>Grades / Percentage</mat-label>
+                <input matInput formControlName="grades" placeholder="e.g. A Grade, 85%" />
+                @if (degreeForm.get('grades')?.invalid && degreeForm.get('grades')?.touched) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Education System -->
               <mat-form-field appearance="outline" class="step-field">
                 <mat-label>Education System</mat-label>
                 <mat-select formControlName="educationSystem">
@@ -94,60 +158,8 @@
                   <mat-error>Required</mat-error>
                 }
               </mat-form-field>
-            </div>
-
-            <div class="form-row two-cols">
-              <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Subjects</mat-label>
-                <input
-                  matInput
-                  formControlName="subjects"
-                  placeholder="e.g. Pre-Engineering, Computer Science"
-                />
-                @if (degreeForm.get('subjects')?.invalid && degreeForm.get('subjects')?.touched) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Grades / Percentage</mat-label>
-                <input matInput formControlName="grades" placeholder="e.g. A Grade, 85%" />
-                @if (degreeForm.get('grades')?.invalid && degreeForm.get('grades')?.touched) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-            </div>
-          } @else {
-            <!-- University Fields -->
-            <div class="form-row">
-              <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Institution / University</mat-label>
-                <mat-select formControlName="institution">
-                  @for (inst of institutions$ | async; track inst) {
-                    <mat-option [value]="inst">{{ inst }}</mat-option>
-                  }
-                </mat-select>
-                @if (
-                  degreeForm.get('institution')?.invalid && degreeForm.get('institution')?.touched
-                ) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-            </div>
-
-            <div class="form-row two-cols">
-              <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Degree</mat-label>
-                <mat-select formControlName="degree">
-                  @for (d of degrees$ | async; track d) {
-                    <mat-option [value]="d">{{ d }}</mat-option>
-                  }
-                </mat-select>
-                @if (degreeForm.get('degree')?.invalid && degreeForm.get('degree')?.touched) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-
+            } @else {
+              <!-- Major (University Only) -->
               <mat-form-field appearance="outline" class="step-field">
                 <mat-label>Major / Field of Study</mat-label>
                 <input matInput formControlName="major" placeholder="e.g. Computer Science" />
@@ -155,23 +167,8 @@
                   <mat-error>Required</mat-error>
                 }
               </mat-form-field>
-            </div>
-
-            <!-- Year / Batch -->
-            <div class="form-row">
-              <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Year / Batch</mat-label>
-                <mat-select formControlName="yearBatch">
-                  @for (b of batches; track b) {
-                    <mat-option [value]="b.value">{{ b.label }}</mat-option>
-                  }
-                </mat-select>
-                @if (degreeForm.get('yearBatch')?.invalid && degreeForm.get('yearBatch')?.touched) {
-                  <mat-error>Required</mat-error>
-                }
-              </mat-form-field>
-            </div>
-          }
+            }
+          </div>
 
           <!-- Degree Upload -->
           <div class="form-row">
@@ -190,6 +187,8 @@
             <div
               class="file-upload-area"
               (click)="triggerFileInput(fileInput)"
+              (keyup.enter)="triggerFileInput(fileInput)"
+              tabindex="0"
               [attr.for]="'degree-certificate'"
             >
               @if (selectedFile) {
