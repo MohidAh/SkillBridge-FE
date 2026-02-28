@@ -61,6 +61,14 @@ export class AuthService {
     return this.user$.pipe(share());
   }
 
+  setUser(user: User) {
+    this.user$.next(user);
+  }
+
+  getUserSnapshot(): User {
+    return this.user$.getValue();
+  }
+
   menu() {
     return iif(() => this.check(), this.loginService.menu(), of([]));
   }

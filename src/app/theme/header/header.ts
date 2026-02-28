@@ -25,8 +25,6 @@ import { UserButton } from '../widgets/user-button';
     Branding,
     // GithubButton,
     NotificationButton,
-    TranslateButton,
-    UserButton,
   ],
 })
 export class Header {

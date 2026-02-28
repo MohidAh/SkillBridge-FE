@@ -1,0 +1,120 @@
+<div class="step-container">
+  <div class="step-header">
+    <div class="step-icon-badge">🙋</div>
+    <h2 class="step-title">Personal Information</h2>
+    <p class="step-desc">Tell us a little about yourself</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="step-form">
+    <!-- Date of Birth + Gender row -->
+    <div class="form-row two-cols">
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>Date of Birth</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="dateOfBirth"
+          placeholder="YYYY-MM-DD"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+        @if (form.get('dateOfBirth')?.invalid && form.get('dateOfBirth')?.touched) {
+          <mat-error>Date of birth is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>Country / Region</mat-label>
+        <mat-select formControlName="country">
+          @for (c of countries; track c) {
+            <mat-option [value]="c">{{ c }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('country')?.invalid && form.get('country')?.touched) {
+          <mat-error>Country is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Gender -->
+    <div class="form-row">
+      <label class="field-label">Gender</label>
+      <div class="radio-group">
+        @for (gender of genders; track gender) {
+          <button
+            type="button"
+            class="radio-card"
+            [class.selected]="form.get('gender')?.value === gender"
+            (click)="form.get('gender')?.setValue(gender)"
+          >
+            @if (form.get('gender')?.value === gender) {
+              <mat-icon class="radio-card__tick">check_circle</mat-icon>
+            }
+            <span class="radio-card__label">{{ gender }}</span>
+          </button>
+        }
+      </div>
+      @if (form.get('gender')?.invalid && form.get('gender')?.touched) {
+        <p class="field-error">Please select your gender</p>
+      }
+    </div>
+
+    <!-- Education Level -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>Education Level</mat-label>
+        <mat-select formControlName="educationLevel">
+          @for (level of educationLevels; track level) {
+            <mat-option [value]="level">{{ level }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('educationLevel')?.invalid && form.get('educationLevel')?.touched) {
+          <mat-error>Education level is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Phone + City row -->
+    <div class="form-row two-cols">
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>Phone Number</mat-label>
+        <input matInput formControlName="phone" placeholder="+92 300 0000000" type="tel" />
+        @if (form.get('phone')?.invalid && form.get('phone')?.touched) {
+          <mat-error>Phone number is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>City</mat-label>
+        <input matInput formControlName="city" placeholder="e.g. Karachi" />
+        @if (form.get('city')?.invalid && form.get('city')?.touched) {
+          <mat-error>City is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Bio -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="step-field">
+        <mat-label>
+          Short Bio
+          <span class="field-hint">(optional)</span>
+        </mat-label>
+        <textarea
+          matInput
+          formControlName="bio"
+          rows="3"
+          placeholder="Tell us a bit about yourself — your background, goals, or anything that defines you…"
+        ></textarea>
+      </mat-form-field>
+    </div>
+
+    <!-- Actions -->
+    <div class="step-actions">
+      <button type="submit" matButton="filled" class="btn-next" [disabled]="form.invalid">
+        Continue
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </form>
+</div>

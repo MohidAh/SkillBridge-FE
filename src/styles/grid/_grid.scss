@@ -5,6 +5,7 @@
 .row {
   display: flex;
   flex-wrap: wrap;
+  margin-top: 0.25rem;
   margin-right: calc(var(--gutter) * -0.5);
   margin-left: calc(var(--gutter) * -0.5);
 }
@@ -22,7 +23,7 @@
 // xlarge: 1920px
 
 @each $breakpoint, $infix in variables.$breakpoint-infixs {
-  @if ($breakpoint== 'xsmall') {
+  @if ($breakpoint=='xsmall') {
     @include columns.loop-grid-columns(variables.$grid-columns, $infix);
   }
 

@@ -38,19 +38,17 @@ export class Login {
   isSubmitting = false;
 
   loginForm = this.fb.nonNullable.group({
-    username: ['admin', [Validators.required]],
-    password: ['skillbridge@123', [Validators.required]],
+    username: ['recca0120', [Validators.required]],
+    password: ['password', [Validators.required]],
     rememberMe: [false],
   });
 
   get username() {
     return this.loginForm.get('username')!;
   }
-
   get password() {
     return this.loginForm.get('password')!;
   }
-
   get rememberMe() {
     return this.loginForm.get('rememberMe')!;
   }
@@ -63,7 +61,14 @@ export class Login {
       .pipe(filter(authenticated => authenticated))
       .subscribe({
         next: () => {
-          this.router.navigateByUrl('/');
+          this.isSubmitting = false;
+          // Redirect to onboarding if profile not yet complete
+          const profileComplete = this.auth.getUserSnapshot()?.['profileComplete'];
+          if (!profileComplete) {
+            this.router.navigateByUrl('/onboarding');
+          } else {
+            this.router.navigateByUrl('/');
+          }
         },
         error: (errorRes: HttpErrorResponse) => {
           if (errorRes.status === 422) {
