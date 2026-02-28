@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -9,11 +9,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SettingsService } from '@core';
 import { MtxAlertModule } from '@ng-matero/extensions/alert';
-import { NgStyle } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthService } from '@core';
-import { Router } from '@angular/router';
-import { RECOMMENDED_CAREERS, Career } from './data';
+import { MtxProgressModule } from '@ng-matero/extensions/progress';
+import { Subscription } from 'rxjs';
+import { CHARTS, ELEMENT_DATA, MESSAGES, STATS } from './data';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,65 +26,162 @@ import { RECOMMENDED_CAREERS, Career } from './data';
     MatTableModule,
     MatTabsModule,
     MatIconModule,
+    MtxProgressModule,
     MtxAlertModule,
-    NgStyle,
   ],
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
+  private readonly ngZone = inject(NgZone);
   private readonly settings = inject(SettingsService);
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
-  user = toSignal(this.auth.user());
-  isLoading = signal(true);
+  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
+  dataSource = ELEMENT_DATA;
 
-  get careers(): Career[] {
-    const u = this.user();
-    // For demonstration, if user has career interests, show actual recommendations
-    // Otherwise return empty array which triggers the empty state in template
-    return u?.['careerInterests']?.length ? RECOMMENDED_CAREERS : [];
-  }
+  messages = MESSAGES;
 
-  get userData() {
-    const u = this.user();
-    return {
-      name: u?.name || 'User',
-      greeting: 'Welcome back',
-      subtitle: 'Here are your recommended career paths based on your profile.',
-    };
-  }
+  charts = CHARTS;
+  chart1?: ApexCharts;
+  chart2?: ApexCharts;
 
-  get personalityTraits() {
-    const u = this.user();
-    const assessment = u?.['assessment'] || {};
-    return [
-      { name: 'Openness', percentage: assessment.openness || 0, color: '#0f969c' },
-      {
-        name: 'Conscientiousness',
-        percentage: assessment.conscientiousness || 0,
-        color: '#6da5c0',
-      },
-      { name: 'Extraversion', percentage: assessment.extraversion || 0, color: '#294d61' },
-      { name: 'Agreeableness', percentage: assessment.agreeableness || 0, color: '#0c7075' },
-      { name: 'Neuroticism', percentage: assessment.neuroticism || 0, color: '#ef4444' },
-    ];
-  }
+  stats = STATS;
 
-  get hasAssessment() {
-    return this.personalityTraits.some(t => t.percentage > 0);
-  }
+  notifySubscription = Subscription.EMPTY;
+
+  isShowAlert = true;
+
+  introducingItems = [
+    {
+      name: 'Acrodata GUI',
+      description: 'A JSON powered GUI for configurable panels.',
+      link: 'https://github.com/acrodata/gui',
+    },
+    {
+      name: 'Code Editor',
+      description: 'The CodeMirror 6 wrapper for Angular.',
+      link: 'https://github.com/acrodata/code-editor',
+    },
+    {
+      name: 'Watermark',
+      description: 'A watermark component that can prevent deletion.',
+      link: 'https://github.com/acrodata/watermark',
+    },
+    {
+      name: 'RnD Dialog',
+      description: 'Resizable and draggable dialog based on CDK dialog.',
+      link: 'https://github.com/acrodata/rnd-dialog',
+    },
+    {
+      name: 'Gradient Picker',
+      description: 'A powerful and beautiful gradient picker.',
+      link: 'https://github.com/acrodata/gradient-picker',
+    },
+    {
+      name: 'Color Picker',
+      description: 'Another beautiful color picker.',
+      link: 'https://github.com/acrodata/color-picker',
+    },
+    {
+      name: 'NG DnD',
+      description: 'A toolkit for building complex drag and drop and very similar to react-dnd.',
+      link: 'https://github.com/ng-dnd/ng-dnd',
+    },
+  ];
+
+  introducingItem = this.introducingItems[this.getRandom(0, 6)];
 
   get isDark() {
     return this.settings.getThemeColor() == 'dark';
   }
 
   ngOnInit() {
-    setTimeout(() => {
-      this.isLoading.set(false);
-    }, 1200);
+    this.notifySubscription = this.settings.notify.subscribe(opts => {
+      console.log(opts);
+
+      this.updateCharts();
+    });
   }
 
-  goToOnboarding() {
-    this.router.navigateByUrl('/onboarding');
+  ngAfterViewInit() {
+    this.ngZone.runOutsideAngular(() => {
+      setTimeout(() => this.initCharts(), 100);
+    });
+  }
+
+  ngOnDestroy() {
+    this.chart1?.destroy();
+    this.chart2?.destroy();
+    this.notifySubscription.unsubscribe();
+  }
+
+  initCharts() {
+    const chartElement1 = document.querySelector('#chart1');
+    const chartElement2 = document.querySelector('#chart2');
+
+    if (chartElement1 && chartElement2) {
+      this.chart1 = new ApexCharts(chartElement1, this.charts[0]);
+      this.chart1.render();
+
+      this.chart2 = new ApexCharts(chartElement2, this.charts[1]);
+      this.chart2.render();
+
+      this.updateCharts();
+
+      // Ensure the charts resize correctly once the layout settles
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 500);
+    } else {
+      console.warn('Dashboard charts could not find target elements #chart1/2');
+    }
+  }
+
+  updateCharts() {
+    this.chart1?.updateOptions({
+      chart: {
+        foreColor: this.isDark ? '#ccc' : '#333',
+        background: 'transparent',
+      },
+      tooltip: {
+        theme: this.isDark ? 'dark' : 'light',
+      },
+      grid: {
+        borderColor: this.isDark ? '#5a5a5a' : '#e1e1e1',
+      },
+      theme: {
+        mode: this.isDark ? 'dark' : 'light',
+      },
+    });
+
+    this.chart2?.updateOptions({
+      chart: {
+        foreColor: this.isDark ? '#ccc' : '#333',
+        background: 'transparent',
+      },
+      plotOptions: {
+        radar: {
+          polygons: {
+            strokeColors: this.isDark ? '#5a5a5a' : '#e1e1e1',
+            connectorColors: this.isDark ? '#5a5a5a' : '#e1e1e1',
+            fill: {
+              colors: this.isDark ? ['#2c2c2c', '#222'] : ['#f2f2f2', '#fff'],
+            },
+          },
+        },
+      },
+      tooltip: {
+        theme: this.isDark ? 'dark' : 'light',
+      },
+      theme: {
+        mode: this.isDark ? 'dark' : 'light',
+      },
+    });
+  }
+
+  onAlertDismiss() {
+    this.isShowAlert = false;
+  }
+
+  getRandom(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }

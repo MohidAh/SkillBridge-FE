@@ -24,7 +24,10 @@ import { AuthService, SettingsService } from '@core';
         <mat-icon>edit</mat-icon>
         <span>{{ 'edit_profile' | translate }}</span>
       </button>
-
+      <button mat-menu-item (click)="restore()">
+        <mat-icon>restore</mat-icon>
+        <span>{{ 'restore_defaults' | translate }}</span>
+      </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>exit_to_app</mat-icon>
         <span>{{ 'logout' | translate }}</span>
@@ -51,5 +54,10 @@ export class UserButton {
     this.auth.logout().subscribe(() => {
       this.router.navigateByUrl('/auth/login');
     });
+  }
+
+  restore() {
+    this.settings.reset();
+    window.location.reload();
   }
 }

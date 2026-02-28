@@ -1,114 +1,70 @@
-<div class="login-page">
-  <!-- Brand glow effect -->
-  <div class="login-glow"></div>
+<div class="d-flex w-full h-full">
+  <mat-card class="m-auto" style="max-width: 380px">
+    <mat-card-header class="m-b-24">
+      <mat-card-title>👋 {{ 'login_title' | translate }}!</mat-card-title>
+    </mat-card-header>
 
-  <div class="login-card-wrapper">
-    <!-- Logo / Brand header -->
-    <div class="login-brand">
-      <div class="login-brand__icon">
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 32 32"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect width="32" height="32" rx="10" fill="#0f969c" fill-opacity="0.2" />
-          <path
-            d="M8 20L14 10L20 16L24 12"
-            stroke="#0f969c"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+    <mat-card-content>
+      <form class="form-field-full" [formGroup]="loginForm">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'username' | translate }}</mat-label>
+          <input matInput placeholder="admin" formControlName="username" required />
+          @if (username.invalid) {
+            <mat-error>
+              @if (username.errors?.['required']) {
+                <span>
+                  {{ 'please_enter' | translate }}
+                  <strong>admin</strong>
+                </span>
+              }
+              @if (username.errors?.['remote']) {
+                <span>{{ username.errors?.['remote'] }}</span>
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'password' | translate }}</mat-label>
+          <input
+            matInput
+            placeholder="skillbridge@123"
+            type="password"
+            formControlName="password"
+            required
           />
-          <circle cx="24" cy="12" r="2" fill="#6da5c0" />
-        </svg>
-      </div>
-      <span class="login-brand__name">SkillBridge</span>
-    </div>
-
-    <!-- Card -->
-    <div class="login-card">
-      <div class="login-card__header">
-        <h1 class="login-card__title">👋 {{ 'login_title' | translate }}!</h1>
-        <p class="login-card__subtitle">Sign in to your workspace</p>
-      </div>
-
-      <mat-card-content class="login-card__content">
-        <form class="login-form" [formGroup]="loginForm">
-          <!-- Username -->
-          <div class="form-group">
-            <mat-form-field appearance="outline" class="login-field w-full">
-              <mat-label>{{ 'username' | translate }}</mat-label>
-              <input matInput placeholder="admin" formControlName="username" required />
-              @if (username.invalid) {
-                <mat-error>
-                  @if (username.errors?.['required']) {
-                    <span>
-                      {{ 'please_enter' | translate }}
-                      <strong>admin</strong>
-                    </span>
-                  }
-                  @if (username.errors?.['remote']) {
-                    <span>{{ username.errors?.['remote'] }}</span>
-                  }
-                </mat-error>
+          @if (password.invalid) {
+            <mat-error>
+              @if (password.errors?.['required']) {
+                <span>
+                  {{ 'please_enter' | translate }}
+                  <strong>admin</strong>
+                </span>
               }
-            </mat-form-field>
-          </div>
-
-          <!-- Password -->
-          <div class="form-group">
-            <mat-form-field appearance="outline" class="login-field w-full">
-              <mat-label>{{ 'password' | translate }}</mat-label>
-              <input
-                matInput
-                placeholder="skillbridge@123"
-                type="password"
-                formControlName="password"
-                required
-              />
-              @if (password.invalid) {
-                <mat-error>
-                  @if (password.errors?.['required']) {
-                    <span>
-                      {{ 'please_enter' | translate }}
-                      <strong>admin</strong>
-                    </span>
-                  }
-                  @if (password.errors?.['remote']) {
-                    <span>{{ password.errors?.['remote'] }}</span>
-                  }
-                </mat-error>
+              @if (password.errors?.['remote']) {
+                <span>{{ password.errors?.['remote'] }}</span>
               }
-            </mat-form-field>
-          </div>
+            </mat-error>
+          }
+        </mat-form-field>
 
-          <!-- Remember me -->
-          <mat-checkbox class="login-checkbox" formControlName="rememberMe">
-            {{ 'remember_me' | translate }}
-          </mat-checkbox>
+        <mat-checkbox formControlName="rememberMe">{{ 'remember_me' | translate }}</mat-checkbox>
 
-          <!-- Submit -->
-          <button
-            class="login-btn w-full"
-            matButton="filled"
-            [disabled]="!!loginForm.invalid"
-            [loading]="isSubmitting"
-            (click)="login()"
-          >
-            {{ 'login' | translate }}
-          </button>
+        <button
+          class="w-full m-y-16"
+          matButton="filled"
+          [disabled]="!!loginForm.invalid"
+          [loading]="isSubmitting"
+          (click)="login()"
+        >
+          {{ 'login' | translate }}
+        </button>
 
-          <!-- Register link -->
-          <div class="login-footer">
-            <span>{{ 'have_no_account' | translate }}?</span>
-            <a routerLink="/auth/register" class="login-footer__link">
-              {{ 'create_one_account' | translate }}
-            </a>
-          </div>
-        </form>
-      </mat-card-content>
-    </div>
-  </div>
+        <div>
+          <span>{{ 'have_no_account' | translate }}?</span>
+          <a routerLink="/auth/register">{{ 'create_one_account' | translate }}</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>

@@ -3,18 +3,16 @@
 .matero-user-panel {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
   cursor: pointer;
   outline: none;
-  background-color: rgb(15 150 156 / 0.05);
-  border-radius: var(--radius-lg);
-  transition: all 0.3s ease;
+  background-color: var(--user-panel-background-color);
+  border-radius: 0.75rem;
 
   &:hover,
   &:focus {
-    background-color: rgb(15 150 156 / 0.1);
-    transform: translateY(-2px);
+    background-color: var(--user-panel-hover-background-color);
   }
 }
 
