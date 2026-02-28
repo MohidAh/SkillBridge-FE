@@ -34,7 +34,6 @@ const MONITOR_MEDIAQUERY = 'screen and (min-width: 600px)';
     Sidebar,
     SidebarNotice,
     Branding,
-    Customizer,
   ],
 })
 export class AdminLayout implements OnDestroy {

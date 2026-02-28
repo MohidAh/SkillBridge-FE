@@ -94,3 +94,10 @@
     <mat-icon class="menu-caret">{{ item.type === 'sub' ? 'arrow_drop_down' : 'launch' }}</mat-icon>
   }
 </ng-template>
+
+<!-- logout button fixed to the bottom of the sidemenu -->
+<div class="sidemenu-logout-container">
+  <mat-icon fontSet="material-icons" class="logout-icon" clickable (click)="logout()">
+    logout
+  </mat-icon>
+</div>

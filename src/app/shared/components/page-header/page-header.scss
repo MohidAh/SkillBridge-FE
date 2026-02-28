@@ -7,7 +7,8 @@
       rgb(from var(--mat-sys-primary) r g b / 0.15) 0%,
       rgb(from var(--mat-sys-primary) r g b / 0.05) 100%);
   border: 1px solid var(--mat-sys-outline);
-  border-radius: var(--mat-sys-corner-medium);
+  // border-radius: var(--mat-sys-corner-medium);
+  border-radius: var(--radius-2xl);
   backdrop-filter: blur(12px);
 
   .theme-dark & {
