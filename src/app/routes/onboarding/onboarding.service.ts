@@ -7,6 +7,7 @@ import {
   SkillsPayload,
   AssessmentPayload,
 } from './onboarding-api.service';
+import { AuthService } from '@core/authentication/auth.service';
 
 export interface OnboardingState {
   currentStep: number;
@@ -27,6 +28,7 @@ const INITIAL_STATE: OnboardingState = {
 @Injectable({ providedIn: 'root' })
 export class OnboardingService {
   private readonly api = inject(OnboardingApiService);
+  private readonly auth = inject(AuthService);
   private state$ = new BehaviorSubject<OnboardingState>(INITIAL_STATE);
 
   get state() {
@@ -55,7 +57,11 @@ export class OnboardingService {
 
   savePersonalInfo(data: PersonalInfoPayload) {
     this.state$.next({ ...this.snapshot, personalInfo: data });
-    this.api.savePersonalInfo(data).subscribe();
+
+    const currentUser = this.auth.getUserSnapshot();
+    const updatedUser = { ...currentUser, ...data };
+
+    this.auth.setUser(updatedUser);
   }
 
   saveAcademicInfo(data: AcademicInfoPayload) {
@@ -65,12 +71,20 @@ export class OnboardingService {
 
   saveSkills(data: SkillsPayload) {
     this.state$.next({ ...this.snapshot, skills: data });
-    this.api.saveSkills(data).subscribe();
+
+    const currentUser = this.auth.getUserSnapshot();
+    const updatedUser = { ...currentUser, ...data };
+
+    this.auth.setUser(updatedUser);
   }
 
   saveAssessment(data: AssessmentPayload) {
     this.state$.next({ ...this.snapshot, assessment: data });
-    this.api.submitAssessment(data).subscribe();
+
+    const currentUser = this.auth.getUserSnapshot();
+    const updatedUser = { ...currentUser, assessment: data };
+
+    this.auth.setUser(updatedUser);
   }
 
   markProfileComplete() {
