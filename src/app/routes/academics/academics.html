@@ -1,87 +1,90 @@
-﻿<div class="row">
-  <div class="col-12 p-24">
-    <mat-card class="overflow-hidden border-none shadow-lg rounded-xl">
-      <mat-card-header
-        class="flex items-center justify-between p-24 border-b border-surface-variant"
+﻿<div class="academics-container">
+  <page-header
+    title="Academics"
+    subtitle="Manage your academic records and track your educational progress"
+    [hideBreadcrumb]="true"
+  >
+    <div actions>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="add()"
+        class="add-btn hvr-lift"
+        [disabled]="isLoading()"
       >
-        <div>
-          <mat-card-title class="text-2xl font-bold">Academics</mat-card-title>
-          <mat-card-subtitle class="text-muted mt-1">
-            Your enrolled subjects and progress
-          </mat-card-subtitle>
+        <mat-icon>add</mat-icon>
+        Add Record
+      </button>
+    </div>
+  </page-header>
+
+  <div class="academics-content grow d-flex flex-column">
+    @if (isLoading()) {
+      <div class="subjects-grid">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="subject-card-wrapper">
+            <mat-card class="subject-card skeleton">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line m-t-16"></div>
+              <div class="skeleton-line short m-t-8"></div>
+            </mat-card>
+          </div>
+        }
+      </div>
+    } @else if (dataSource().length === 0) {
+      <div class="empty-state hvr-glow">
+        <div class="empty-icon-wrapper">
+          <mat-icon>history_edu</mat-icon>
         </div>
-        <button mat-flat-button color="primary" (click)="add()" class="rounded-lg px-20">
-          <mat-icon class="mr-8">add</mat-icon>
-          Add Subject
+        <h3 class="empty-title">No Academic Records</h3>
+        <p class="empty-subtitle">
+          Your academic history is currently empty. Start building your profile by adding your
+          latest educational record.
+        </p>
+        <button mat-flat-button color="primary" (click)="add()" class="hvr-lift mt-button">
+          <mat-icon class="m-r-8">add</mat-icon>
+          Add My First Record
         </button>
-      </mat-card-header>
+      </div>
+    } @else {
+      <div class="subjects-grid">
+        @for (item of dataSource(); track item.institution) {
+          <div class="subject-card-wrapper">
+            <mat-card class="subject-card hvr-lift">
+              <mat-card-header>
+                <div class="card-top-row">
+                  <span class="subject-code">
+                    {{ item.yearBatch ? item.yearBatch + ' Year/Batch' : '' }}
+                  </span>
+                  <mat-chip class="status-badge university">
+                    {{ item.type === 'university' ? 'University' : 'High School' }}
+                  </mat-chip>
+                </div>
+              </mat-card-header>
 
-      <mat-card-content class="p-0">
-        <div class="overflow-x-auto">
-          <table mat-table [dataSource]="dataSource" class="w-full">
-            <ng-container matColumnDef="code">
-              <th mat-header-cell *matHeaderCellDef class="font-bold">Code</th>
-              <td mat-cell *matCellDef="let item" class="font-medium text-muted">
-                {{ item.code }}
-              </td>
-            </ng-container>
+              <mat-card-content class="m-t-16">
+                <h3 class="subject-title">{{ item.degree }}</h3>
+                <div class="institution-info m-b-12">
+                  <mat-icon>school</mat-icon>
+                  <span>{{ item.institution }}</span>
+                </div>
+                @if (item.major) {
+                  <div class="major-info">
+                    <span class="text-muted">Major:</span>
+                    <span>{{ item.major }}</span>
+                  </div>
+                }
+              </mat-card-content>
 
-            <ng-container matColumnDef="subject">
-              <th mat-header-cell *matHeaderCellDef class="font-bold">Subject</th>
-              <td mat-cell *matCellDef="let item" class="font-semibold">
-                {{ item.subject }}
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="semester">
-              <th mat-header-cell *matHeaderCellDef class="font-bold">Semester</th>
-              <td mat-cell *matCellDef="let item" class="text-muted">
-                {{ item.semester }}
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="credits">
-              <th mat-header-cell *matHeaderCellDef class="font-bold">Credits</th>
-              <td mat-cell *matCellDef="let item">
-                <span class="px-8 py-4 bg-surface-variant rounded-md text-xs font-bold">
-                  {{ item.credits }} CR
-                </span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef class="font-bold">Status</th>
-              <td mat-cell *matCellDef="let item">
-                <mat-chip
-                  [class]="
-                    'status-chip border-none font-bold ' +
-                    item.status.toLowerCase().replace(' ', '-')
-                  "
-                >
-                  {{ item.status }}
-                </mat-chip>
-              </td>
-            </ng-container>
-
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="font-bold">Actions</th>
-              <td mat-cell *matCellDef="let item">
-                <button
-                  mat-icon-button
-                  (click)="edit(item)"
-                  class="text-indigo-600 hover:bg-indigo-50"
-                >
-                  <mat-icon>edit</mat-icon>
+              <mat-card-actions align="end" class="p-16">
+                <button mat-icon-button (click)="edit(item)" title="Edit Record" class="edit-btn">
+                  <mat-icon>edit_note</mat-icon>
                 </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="cursor-default"></tr>
-          </table>
-        </div>
-      </mat-card-content>
-    </mat-card>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        }
+      </div>
+    }
   </div>
 </div>

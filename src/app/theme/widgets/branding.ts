@@ -17,7 +17,7 @@ import { Component, input } from '@angular/core';
       margin: 0 0.5rem;
       text-decoration: none;
       white-space: nowrap;
-      color: inherit;
+      color: var(--mat-sys-on-surface);
       border-radius: 50rem;
     }
 
@@ -29,8 +29,9 @@ import { Component, input } from '@angular/core';
 
     .branding-name {
       margin: 0 0.5rem;
-      font-size: 1rem;
-      font-weight: 500;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
   `,
 })

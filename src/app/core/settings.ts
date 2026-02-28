@@ -20,6 +20,6 @@ export const defaults: AppSettings = {
   headerPos: 'fixed',
   showUserPanel: true,
   sidenavOpened: true,
-  sidenavCollapsed: false,
+  sidenavCollapsed: true,
   language: 'auto',
 };
