@@ -5,17 +5,40 @@
 }
 
 .subjects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  /* flex container for card wrappers */
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.subject-card-wrapper {
+  display: flex;
+
+  /* fixed width wrapper ensures cards sit side-by-side; prevents 100% stretching */
+  flex: 0 0 320px;
+}
+
+/* when viewport too narrow (single column) use full width */
+@media (width <= 360px) {
+  .subject-card-wrapper {
+    flex: 1 1 100%;
+  }
 }
 
 .subject-card {
+  /* make card a flex column so header/content/actions can space nicely */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   height: 100%;
+  min-height: 320px;
   padding: 24px;
   background: var(--mat-sys-surface-container-low) !important;
   border: 1px solid var(--mat-sys-outline) !important;
   border-radius: 32px !important;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
   backdrop-filter: blur(16px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -30,6 +53,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    margin-bottom: 12px;
   }
 
   .subject-code {
@@ -56,6 +80,7 @@
     margin: 0 0 12px;
     font-size: 1.25rem;
     font-weight: 700;
+    line-height: 1.2;
     color: var(--mat-sys-on-surface);
   }
 
@@ -74,6 +99,7 @@
   }
 
   .major-info {
+    margin-top: 8px;
     font-size: 0.875rem;
     color: var(--mat-sys-on-surface-variant);
     opacity: 0.8;
