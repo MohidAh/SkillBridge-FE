@@ -1,5 +1,8 @@
 module.exports = {
-  '*.ts': ['eslint --fix', 'prettier --write'],
-  '*.scss': ['stylelint --fix'],
-  '*.{html,css,js,json,md,yml}': ['prettier --write'],
+  '*.ts': filenames => [
+    `eslint --fix ${filenames.join(' ')}`,
+    `prettier --write ${filenames.join(' ')}`,
+  ],
+  '*.scss': filenames => `stylelint --fix ${filenames.join(' ')}`,
+  '*.{html,css,js,json,md,yml}': filenames => `git add ${filenames.join(' ')}`,
 };

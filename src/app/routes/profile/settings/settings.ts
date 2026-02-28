@@ -1,5 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatOptionModule } from '@angular/material/core';
@@ -8,8 +14,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthService } from '@core';
+
+import { ControlsOf, IProfile } from '@shared';
 
 @Component({
   selector: 'app-profile-settings',
@@ -28,60 +34,27 @@ import { AuthService } from '@core';
     MatSelectModule,
   ],
 })
-export class ProfileSettings implements OnInit {
+export class ProfileSettings {
   private readonly fb = inject(FormBuilder);
-  private readonly auth = inject(AuthService);
 
-  user = toSignal(this.auth.user());
-
-  form = this.fb.nonNullable.group({
-    name: ['', [Validators.required]],
+  reactiveForm = this.fb.nonNullable.group({
+    username: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    dateOfBirth: ['', [Validators.required]],
     gender: ['', [Validators.required]],
-    educationLevel: ['', [Validators.required]],
-    phone: ['', [Validators.required]],
-    country: ['', [Validators.required]],
     city: ['', [Validators.required]],
-    bio: [''],
+    address: ['', [Validators.required]],
+    company: ['', [Validators.required]],
+    mobile: ['', [Validators.required]],
+    tele: ['', [Validators.required]],
+    website: ['', [Validators.required]],
+    date: ['', [Validators.required]],
   });
 
-  readonly genders = ['Male', 'Female', 'Prefer not to say'];
-  readonly educationLevels = ['High School', 'University', 'Graduate'];
-  readonly countries = [
-    'Pakistan',
-    'United States',
-    'United Kingdom',
-    'Canada',
-    'Australia',
-    'India',
-    'Germany',
-    'UAE',
-    'Saudi Arabia',
-    'Other',
-  ];
-
-  ngOnInit() {
-    const u = this.user();
-    if (u) {
-      this.form.patchValue({
-        name: u.name || '',
-        email: u.email || '',
-        dateOfBirth: u['dateOfBirth'] || '',
-        gender: u['gender'] || '',
-        educationLevel: u['educationLevel'] || '',
-        phone: u['phone'] || '',
-        country: u['country'] || '',
-        city: u['city'] || '',
-        bio: u['bio'] || '',
-      });
-    }
-  }
-
-  save() {
-    if (this.form.valid) {
-      console.log('Saving profile:', this.form.value);
-      // In a real app, we'd call a service to update the user
-    }
+  getErrorMessage(form: FormGroup<ControlsOf<IProfile>>) {
+    return form.get('email')?.hasError('required')
+      ? 'You must enter a value'
+      : form.get('email')?.hasError('email')
+        ? 'Not a valid email'
+        : '';
   }
 }

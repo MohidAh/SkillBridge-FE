@@ -8,67 +8,23 @@
   height: 100%;
 }
 
-.matero-branding-top {
-  position: fixed;
-  top: 1.5rem;
-  left: 1.5rem;
-  z-index: 1000;
-  pointer-events: auto;
-
-  [dir='rtl'] & {
-    right: 1.5rem;
-    left: auto;
-  }
-}
-
 .matero-sidenav {
-  --mat-sidenav-container-width: calc(var(--sidenav-width) - 2rem);
+  --mat-sidenav-container-width: var(--sidenav-width);
 
   position: absolute;
-  top: 50% !important;
-  left: 1.5rem !important;
-  height: auto !important;
-  max-height: calc(100% - 4rem) !important;
-  overflow: visible !important;
-  background-color: rgb(255 255 255 / 0.4) !important;
-  border: 1px solid rgb(15 150 156 / 0.1) !important;
-  border-radius: 2rem !important;
-  box-shadow: 0 20px 50px rgb(5 22 26 / 0.1) !important;
-  backdrop-filter: blur(24px) !important;
-  transform: translateY(-50%) !important;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-
-  [dir='rtl'] & {
-    right: 1.5rem !important;
-    left: auto !important;
-  }
-
-  ::ng-deep .mat-sidenav-inner-container {
-    overflow: visible !important;
-  }
-
-  .theme-dark & {
-    background-color: rgb(5 22 26 / 0.4) !important;
-    border-color: rgb(224 244 245 / 0.1) !important;
-  }
-
-  &::before {
-    position: absolute;
-    inset: 0;
-    padding: 1px;
-    pointer-events: none;
-    content: '';
-    background: linear-gradient(to bottom, rgb(15 150 156 / 0.2), transparent, rgb(15 150 156 / 0.1));
-    border-radius: inherit;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-  }
+  overflow-x: hidden;
+  border-width: 0 !important;
+  transition-property: transform, width !important;
 }
 
 // Layout control
 .matero-header-above {
   .matero-container {
-    height: 100% !important;
+    height: calc(100% - var(--mat-toolbar-standard-height)) !important;
+
+    @include breakpoints.bp-lt(small) {
+      height: calc(100% - var(--mat-toolbar-mobile-height)) !important;
+    }
   }
 
   .matero-sidebar-main {
@@ -77,26 +33,16 @@
   }
 }
 
-.matero-content {
-  padding-left: calc(var(--sidenav-width) + 1.5rem);
-  margin-left: 0 !important;
-  background-color: transparent;
-
-  [dir='rtl'] & {
-    padding-right: calc(var(--sidenav-width) + 1.5rem);
-    padding-left: 0;
-    margin-right: 0 !important;
-  }
-}
-
 // Layout control
 .matero-sidenav-collapsed {
   .matero-sidenav {
     width: var(--sidenav-collapsed-width);
 
+    .menu-name,
+    .menu-label,
+    .menu-badge,
     .menu-caret,
     .matero-user-panel-info {
-      visibility: hidden;
       opacity: 0;
     }
 
@@ -105,24 +51,44 @@
     }
 
     .matero-user-panel-avatar {
-      transform: scale(0.6);
+      transform: scale(0.5);
     }
 
+    &:hover {
+      width: var(--sidenav-width);
+
+      .menu-name,
+      .menu-label,
+      .menu-badge,
+      .menu-caret,
+      .matero-user-panel-info {
+        opacity: 1;
+      }
+
+      .menu-icon.submenu-icon {
+        opacity: 0;
+      }
+
+      .matero-user-panel-avatar {
+        transform: scale(1);
+      }
+    }
   }
 
   .matero-content {
-    padding-left: calc(var(--sidenav-collapsed-width) + 2rem);
-    margin-left: 0 !important;
+    margin-left: var(--sidenav-collapsed-width) !important;
 
     [dir='rtl'] & {
-      padding-right: calc(var(--sidenav-collapsed-width) + 2rem);
-      padding-left: 0;
-      margin-right: 0 !important;
+      margin-right: var(--sidenav-collapsed-width) !important;
+      margin-left: auto !important;
     }
   }
+
+  &[dir='rtl'] .matero-content {
+    margin-right: var(--sidenav-collapsed-width) !important;
+    margin-left: auto !important;
+  }
 }
-
-
 
 // Layout control
 .matero-navbar-top {
@@ -145,17 +111,6 @@
   .matero-header {
     position: sticky;
     top: 0;
-    margin: 0;
-    background-color: transparent !important;
-    background-color: rgb(255 255 255 / 0.5);
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    backdrop-filter: blur(12px);
-
-    .theme-dark & {
-      background-color: rgb(5 22 26 / 0.5);
-    }
   }
 
   .matero-topmenu {
@@ -169,35 +124,11 @@
 
 .matero-page-content {
   position: relative;
-  min-height: 100vh;
   padding: var(--gutter);
 
   .matero-header+&,
   .matero-header-above &,
   .matero-navbar-top & {
-    padding-top: 1rem;
-  }
-}
-
-.matero-notice-drawer {
-  width: 400px !important;
-  background-color: rgb(255 255 255 / 0.8) !important;
-  border-left: 1px solid rgb(15 150 156 / 0.1) !important;
-  box-shadow: -10px 0 50px rgb(5 22 26 / 0.1) !important;
-  backdrop-filter: blur(30px) !important;
-
-  .theme-dark & {
-    background-color: rgb(5 22 26 / 0.8) !important;
-    border-left: 1px solid rgb(224 244 245 / 0.1) !important;
-  }
-
-  [dir='rtl'] & {
-    border-right: 1px solid rgb(15 150 156 / 0.1) !important;
-    border-left: none !important;
-
-    .theme-dark & {
-      border-right: 1px solid rgb(224 244 245 / 0.1) !important;
-      border-left: none !important;
-    }
+    padding-top: 0;
   }
 }

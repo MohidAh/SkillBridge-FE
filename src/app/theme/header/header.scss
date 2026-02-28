@@ -4,10 +4,6 @@
   position: relative;
   z-index: 200;
   display: block;
-  background-color: rgb(255 255 255 / 0.5);
-  backdrop-filter: blur(12px);
-
-  .theme-dark & {
-    background-color: rgb(5 22 26 / 0.5);
-  }
+  background-color: var(--header-background-color);
+  backdrop-filter: blur(8px);
 }

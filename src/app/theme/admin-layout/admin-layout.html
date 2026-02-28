@@ -7,7 +7,6 @@
   [class.matero-header-fixed]="options.headerPos === 'fixed'"
   [dir]="options.dir"
 >
-  <app-branding class="matero-branding-top" />
   <ng-progress ngProgressRouter />
 
   <!-- Header Above -->
@@ -37,7 +36,7 @@
       />
     </mat-sidenav>
 
-    <mat-sidenav #sidenavNotice position="end" mode="over" class="matero-notice-drawer">
+    <mat-sidenav #sidenavNotice position="end" mode="over">
       <app-sidebar-notice />
     </mat-sidenav>
 
@@ -60,4 +59,7 @@
       </main>
     </mat-sidenav-content>
   </mat-sidenav-container>
+
+  <!-- Demo purposes only -->
+  <app-customizer (optionsChange)="updateOptions($event)" />
 </div>

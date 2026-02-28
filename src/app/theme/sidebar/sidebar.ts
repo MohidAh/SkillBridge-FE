@@ -1,13 +1,12 @@
-import { Component, ViewEncapsulation, input, output, inject } from '@angular/core';
+import { Component, ViewEncapsulation, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 
-import { AuthService } from '@core';
 import { Sidemenu } from '../sidemenu/sidemenu';
+import { Branding } from '../widgets/branding';
+import { UserPanel } from './user-panel';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,12 +18,12 @@ import { Sidemenu } from '../sidemenu/sidemenu';
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
+    Branding,
     Sidemenu,
-    TranslateModule,
+    UserPanel,
   ],
 })
 export class Sidebar {
-  // inputs/outputs for layout
   readonly showToggle = input(true);
   readonly showUser = input(true);
   readonly showHeader = input(true);
@@ -32,14 +31,4 @@ export class Sidebar {
 
   readonly toggleCollapsed = output<void>();
   readonly closeSidenav = output<void>();
-
-  // services for logout functionality
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
-
-  logout() {
-    this.auth.logout().subscribe(() => {
-      this.router.navigateByUrl('/auth/login');
-    });
-  }
 }

@@ -10,7 +10,6 @@ import { Subscription, filter } from 'rxjs';
 import { AppSettings, SettingsService } from '@core';
 import { Customizer } from '../customizer/customizer';
 import { Header } from '../header/header';
-import { Branding } from '../widgets/branding';
 import { SidebarNotice } from '../sidebar-notice/sidebar-notice';
 import { Sidebar } from '../sidebar/sidebar';
 import { Topmenu } from '../topmenu/topmenu';
@@ -33,7 +32,7 @@ const MONITOR_MEDIAQUERY = 'screen and (min-width: 600px)';
     Topmenu,
     Sidebar,
     SidebarNotice,
-    Branding,
+    Customizer,
   ],
 })
 export class AdminLayout implements OnDestroy {

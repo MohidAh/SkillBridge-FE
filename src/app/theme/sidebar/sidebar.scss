@@ -1,27 +1,26 @@
 @use '../../../styles/grid/breakpoints';
 
+.matero-sidebar-header {
+  overflow: hidden;
 
-
-.matero-sidebar-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  padding: 1rem 0.5rem;
-  overflow: visible !important;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
+  mat-toolbar {
+    width: var(--sidenav-width);
+    padding: 0 0.5rem;
   }
 
-  @include breakpoints.bp-lt(small) {
-    height: auto;
+  // Remove redundant padding in the slide toggle
+  mat-slide-toggle .mdc-label {
+    display: none;
   }
 }
 
-/* footer area for logout, sticks to bottom */
-.matero-sidebar-footer {
-  padding: 0.5rem 1rem;
-  margin-top: auto;
+.matero-sidebar-main {
+  height: calc(100% - var(--mat-toolbar-standard-height));
+  padding: 0 0.5rem 0.5rem;
+  overflow: auto;
+  scrollbar-width: none;
+
+  @include breakpoints.bp-lt(small) {
+    height: calc(100% - var(--mat-toolbar-mobile-height));
+  }
 }
