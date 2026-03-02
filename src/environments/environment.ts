@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'https://c0b2-39-63-63-28.ngrok-free.app',
+  baseUrl: 'https://kh91w57m-7216.inc1.devtunnels.ms',
   useHash: false,
 };
 

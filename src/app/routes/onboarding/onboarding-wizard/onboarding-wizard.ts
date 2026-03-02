@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,11 +25,11 @@ import { StepPsychology } from '../steps/step-psychology/step-psychology';
     StepPsychology,
   ],
 })
-export class OnboardingWizard implements OnInit {
+export class OnboardingWizard {
   protected readonly onboarding = inject(OnboardingService);
   private readonly router = inject(Router);
 
-  currentStep = signal(0);
+  // Removed local currentStep signal
 
   readonly steps = [
     { label: 'Personal Info', icon: 'person', description: 'Tell us about yourself' },
@@ -38,22 +38,25 @@ export class OnboardingWizard implements OnInit {
     { label: 'Personality', icon: 'psychology', description: 'Discover your traits' },
   ];
 
-  ngOnInit() {
-    this.onboarding.state.subscribe(s => this.currentStep.set(s.currentStep));
-  }
+  // Removed ngOnInit subscription
 
   onPersonalSaved(data: any) {
-    this.onboarding.savePersonalInfo(data);
+    if (this.onboarding.snapshot.personalInfo) {
+      this.onboarding.updatePersonalInfo(data).subscribe(() => {
+        this.onboarding.nextStep();
+      });
+    } else {
+      this.onboarding.savePersonalInfo(data).subscribe(() => {
+        this.onboarding.nextStep();
+      });
+    }
+  }
+
+  onAcademicSaved() {
     this.onboarding.nextStep();
   }
 
-  onAcademicSaved(data: any) {
-    this.onboarding.saveAcademicInfo(data);
-    this.onboarding.nextStep();
-  }
-
-  onSkillsSaved(data: any) {
-    this.onboarding.saveSkills(data);
+  onSkillsSaved() {
     this.onboarding.nextStep();
   }
 

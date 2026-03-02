@@ -120,32 +120,95 @@
     border-radius: 99px;
 }
 
-.trait-progress {
-    .trait-name {
-        font-size: 0.875rem;
-        font-weight: 600;
+.trait-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.trait-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
     }
 
-    .trait-val {
+    &__icon {
+        font-size: 1.25rem;
+    }
+
+    &__name {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--mat-sys-on-surface);
+    }
+
+    &__desc {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--mat-sys-on-surface-variant);
+    }
+}
+
+.trait-bar-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.trait-bar {
+    flex: 1;
+    height: 8px;
+    overflow: hidden;
+    background: var(--mat-sys-surface-container-highest);
+    border-radius: 99px;
+
+    &__fill {
+        height: 100%;
+        border-radius: 99px;
+        animation: fill-in 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+}
+
+.trait-bar__score {
+    width: 38px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--mat-sys-primary);
+    text-align: right;
+}
+
+.summary-card {
+    padding: 24px;
+    background: color-mix(in srgb, var(--mat-sys-primary) 5%, var(--mat-sys-surface-container-high));
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 20px;
+
+    h4 {
+        margin: 0 0 12px;
         font-size: 0.875rem;
         font-weight: 700;
         color: var(--mat-sys-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .progress-track {
-        width: 100%;
-        height: 8px;
-        overflow: hidden;
-        background: var(--mat-sys-outline);
-        border-radius: 4px;
-        opacity: 0.6;
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--mat-sys-on-surface-variant);
     }
+}
 
-    .progress-fill {
-        height: 100%;
-        background: var(--mat-sys-primary);
-        border-radius: 4px;
-        transition: width 1s ease-out;
+@keyframes fill-in {
+    from {
+        width: 0;
     }
 }
 
@@ -283,7 +346,7 @@
     }
 }
 
-@media (width <= 768px) {
+@media (width <=768px) {
     .personal-grid {
         grid-template-columns: 1fr;
     }

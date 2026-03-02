@@ -41,11 +41,11 @@
       @for (step of steps; track step.label; let i = $index) {
         <div
           class="step-progress__item"
-          [class.active]="i === currentStep()"
-          [class.done]="i < currentStep()"
+          [class.active]="i === onboarding.currentStep()"
+          [class.done]="i < onboarding.currentStep()"
         >
           <div class="step-progress__circle">
-            @if (i < currentStep()) {
+            @if (i < onboarding.currentStep()) {
               <mat-icon class="step-done-icon">check</mat-icon>
             } @else {
               <mat-icon>{{ step.icon }}</mat-icon>
@@ -57,22 +57,22 @@
           </div>
         </div>
         @if (i < steps.length - 1) {
-          <div class="step-progress__connector" [class.done]="i < currentStep()"></div>
+          <div class="step-progress__connector" [class.done]="i < onboarding.currentStep()"></div>
         }
       }
     </div>
 
     <!-- Step Content Card -->
     <div class="onboarding-card">
-      @switch (currentStep()) {
+      @switch (onboarding.currentStep()) {
         @case (0) {
           <app-step-personal (saved)="onPersonalSaved($event)" />
         }
         @case (1) {
-          <app-step-academic (saved)="onAcademicSaved($event)" (back)="goBack()" />
+          <app-step-academic (saved)="onAcademicSaved()" (back)="goBack()" />
         }
         @case (2) {
-          <app-step-skills (saved)="onSkillsSaved($event)" (back)="goBack()" />
+          <app-step-skills (saved)="onSkillsSaved()" (back)="goBack()" />
         }
         @case (3) {
           <app-step-psychology (saved)="onAssessmentSaved($event)" (back)="goBack()" />
@@ -81,6 +81,6 @@
     </div>
 
     <!-- Footer -->
-    <p class="onboarding-footer">Step {{ currentStep() + 1 }} of {{ steps.length }}</p>
+    <p class="onboarding-footer">Step {{ onboarding.currentStep() + 1 }} of {{ steps.length }}</p>
   </div>
 </div>

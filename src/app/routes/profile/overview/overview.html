@@ -51,28 +51,42 @@
             <div class="personal-grid">
               <div class="info-item">
                 <span class="info-label">Full Name</span>
-                <span class="info-value">{{ personalInfo.name }}</span>
+                <span class="info-value">{{ personalInfo()?.name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ personalInfo()?.email }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">Date of Birth</span>
-                <span class="info-value">{{ personalInfo.dob | date: 'mediumDate' }}</span>
+                <span class="info-value">
+                  {{ personalInfo()?.dateOfBirth | date: 'mediumDate' }}
+                </span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Gender</span>
+                <span class="info-value">{{ genderLabel }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Level</span>
+                <span class="info-value">{{ educationLevelLabel }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">Country</span>
-                <span class="info-value">{{ personalInfo.country }}</span>
+                <span class="info-value">{{ personalInfo()?.country }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">City</span>
-                <span class="info-value">{{ personalInfo.city }}</span>
+                <span class="info-value">{{ personalInfo()?.city }}</span>
               </div>
               <div class="info-item w-full">
                 <span class="info-label">Phone</span>
-                <span class="info-value">{{ personalInfo.phone }}</span>
+                <span class="info-value">{{ personalInfo()?.phoneNumber }}</span>
               </div>
               <div class="info-item w-full">
                 <span class="info-label">Short Bio</span>
                 <p class="info-value bio-text">
-                  {{ personalInfo.bio || 'Tell us about yourself...' }}
+                  {{ personalInfo()?.shortBio || 'Tell us about yourself...' }}
                 </p>
               </div>
             </div>
@@ -96,8 +110,8 @@
               <div class="skills-block m-b-24">
                 <h4 class="block-subtitle m-b-12">Skills</h4>
                 <div class="chip-row d-flex flex-wrap gap-8">
-                  @for (skill of skillsInterests.skills; track skill) {
-                    <span class="skill-chip">{{ skill }}</span>
+                  @for (skill of preferences()?.skills; track skill.id) {
+                    <span class="skill-chip">{{ skill.name }}</span>
                   }
                 </div>
               </div>
@@ -105,7 +119,7 @@
               <div class="interests-block m-b-24">
                 <h4 class="block-subtitle m-b-12">Career Interests</h4>
                 <div class="row g-2">
-                  @for (interest of skillsInterests.interests; track interest.name) {
+                  @for (interest of displayInterests; track interest.name) {
                     <div class="col-4">
                       <div class="interest-tile">
                         <mat-icon color="primary">{{ interest.icon }}</mat-icon>
@@ -119,7 +133,7 @@
               <div class="course-skills-block">
                 <h4 class="block-subtitle m-b-12">Course-Based Skills</h4>
                 <div class="chip-row d-flex flex-wrap gap-8">
-                  @for (skill of skillsInterests.courseSkills; track skill) {
+                  @for (skill of preferences()?.courseSkills; track skill) {
                     <span class="course-chip">{{ skill }}</span>
                   }
                 </div>
@@ -154,42 +168,53 @@
             </div>
           </mat-card-header>
           <mat-card-content>
-            @if (hasAssessment) {
-              <div class="traits-container">
-                @for (trait of personalityResults; track trait.name) {
-                  <div class="trait-progress m-b-20">
-                    <div class="d-flex justify-content-between m-b-6">
-                      <span class="trait-name">{{ trait.name }}</span>
-                      <span class="trait-val">{{ trait.percentage }}%</span>
+            @if (hasPersonality) {
+              <div class="trait-bars m-b-24">
+                @for (trait of traitConfig; track trait.key) {
+                  <div class="trait-row">
+                    <div class="trait-row__meta">
+                      <span class="trait-row__icon">{{ trait.icon }}</span>
+                      <div>
+                        <span class="trait-row__name">{{ trait.label }}</span>
+                        <span class="trait-row__desc">{{ trait.desc }}</span>
+                      </div>
                     </div>
-                    <div class="progress-track">
-                      <div
-                        class="progress-fill"
-                        [ngStyle]="{ width: trait.percentage + '%' }"
-                      ></div>
+                    <div class="trait-bar-wrap">
+                      <div class="trait-bar">
+                        <div
+                          class="trait-bar__fill"
+                          [style.backgroundColor]="trait.color"
+                          [style.width.%]="personalityResult()?.[trait.key]"
+                        ></div>
+                      </div>
+                      <span class="trait-bar__score">{{ personalityResult()?.[trait.key] }}%</span>
                     </div>
                   </div>
                 }
               </div>
-              <div class="d-flex justify-content-center m-t-24">
-                <button mat-button color="primary" (click)="goToOnboarding()">
-                  Retake Assessment
-                </button>
-              </div>
+
+              @if (personalityResult()?.summary) {
+                <div class="summary-card">
+                  <h4>Analysis Summary</h4>
+                  <p>{{ personalityResult()?.summary }}</p>
+                </div>
+              }
             } @else {
               <div class="empty-profile-state text-center p-y-24 hvr-glow">
                 <div class="empty-icon-circle m-b-16 secondary">
                   <mat-icon>psychology</mat-icon>
                 </div>
-                <h4 class="empty-title">No Personality Data</h4>
-                <p class="empty-subtitle">Discover your strengths and personality traits.</p>
+                <h4 class="empty-title">Assessment Incomplete</h4>
+                <p class="empty-subtitle">
+                  Understand your learning style and career fit with a personality test.
+                </p>
                 <button
                   mat-flat-button
                   color="secondary"
                   (click)="goToOnboarding()"
                   class="hvr-lift mt-2"
                 >
-                  Complete Assessment
+                  Start Assessment
                 </button>
               </div>
             }
