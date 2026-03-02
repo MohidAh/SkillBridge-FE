@@ -36,21 +36,24 @@
 
       <mat-card-content class="login-card__content">
         <form class="login-form" [formGroup]="loginForm">
-          <!-- Username -->
+          <!-- Email -->
           <div class="form-group">
             <mat-form-field appearance="outline" class="login-field w-full">
-              <mat-label>{{ 'username' | translate }}</mat-label>
-              <input matInput placeholder="admin" formControlName="username" required />
-              @if (username.invalid) {
+              <mat-label>{{ 'email' | translate }}</mat-label>
+              <input matInput placeholder="admin@example.com" formControlName="email" required />
+              @if (email.invalid) {
                 <mat-error>
-                  @if (username.errors?.['required']) {
+                  @if (email.errors?.['required']) {
                     <span>
                       {{ 'please_enter' | translate }}
-                      <strong>admin</strong>
+                      <strong>{{ 'email' | translate }}</strong>
                     </span>
                   }
-                  @if (username.errors?.['remote']) {
-                    <span>{{ username.errors?.['remote'] }}</span>
+                  @if (email.errors?.['email']) {
+                    <span>{{ 'invalid_email' | translate }}</span>
+                  }
+                  @if (email.errors?.['remote']) {
+                    <span>{{ email.errors?.['remote'] }}</span>
                   }
                 </mat-error>
               }

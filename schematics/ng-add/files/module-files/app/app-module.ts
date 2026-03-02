@@ -26,9 +26,6 @@ import { BASE_URL, interceptors, StartupService, TranslateLangService } from '@c
 import { environment } from '@env/environment';
 import { formlyConfigFactory } from '@shared';
 
-import { LoginService } from '@core/authentication/login.service';
-import { FakeLoginService } from './fake-login.service';
-
 @NgModule({
   declarations: [App],
   imports: [
@@ -56,13 +53,7 @@ import { FakeLoginService } from './fake-login.service';
       useFactory: formlyConfigFactory,
       deps: [TranslateService],
       multi: true,
-    },
-    // ==================================================
-    // 👇 ❌ Remove it in the realworld application
-    //
-    { provide: LoginService, useClass: FakeLoginService },
-    //
-    // ==================================================
+    }
   ],
   bootstrap: [App],
 })

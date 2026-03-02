@@ -33,11 +33,23 @@ export class AuthService {
     return this.tokenService.valid();
   }
 
-  login(username: string, password: string, rememberMe = false) {
-    return this.loginService.login(username, password, rememberMe).pipe(
-      tap(token => this.tokenService.set(token)),
+  login(email: string, password: string, rememberMe = false) {
+    return this.loginService.login(email, password, rememberMe).pipe(
+      tap(res => {
+        const { token, tokenType, expiresInMinutes, user } = res.data;
+        this.tokenService.set({
+          access_token: token,
+          token_type: tokenType,
+          expires_in: expiresInMinutes * 60,
+        });
+        this.setUser(user);
+      }),
       map(() => this.check())
     );
+  }
+
+  register(params: any) {
+    return this.loginService.register(params);
   }
 
   refresh() {
@@ -70,7 +82,7 @@ export class AuthService {
   }
 
   menu() {
-    return iif(() => this.check(), this.loginService.menu(), of([]));
+    return of([]); // Menu is now defined in the app, returning empty as placeholder
   }
 
   private assignUser() {
@@ -82,6 +94,6 @@ export class AuthService {
       return of(this.user$.getValue());
     }
 
-    return this.loginService.user().pipe(tap(user => this.user$.next(user)));
+    return of({}).pipe(tap(user => this.user$.next(user)));
   }
 }
