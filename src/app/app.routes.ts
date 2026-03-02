@@ -69,7 +69,7 @@ export const routes: Routes = [
     // Onboarding lives in AuthLayout (no admin sidebar)
     path: 'onboarding',
     component: AuthLayout,
-    canActivate: [authGuard],
+    // canActivate: [authGuard],
     loadChildren: () => import('./routes/onboarding/onboarding.routes').then(m => m.routes),
   },
   { path: '**', redirectTo: 'dashboard' },

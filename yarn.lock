@@ -2689,13 +2689,6 @@ angular-eslint@^21.1.0:
     "@typescript-eslint/types" "^8.0.0"
     "@typescript-eslint/utils" "^8.0.0"
 
-angular-in-memory-web-api@~0.21.0:
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/angular-in-memory-web-api/-/angular-in-memory-web-api-0.21.0.tgz#3843b94840ca44cb3200699bfea67b63ffc3a951"
-  integrity sha512-bQ9SSj4Gd3bppWWhnWkgIMRB6g8zfddSgs3JGgwh0+BJmsn3t8A8pPMVPf8e1i7Gj54UFJn4oqN0O1U0bcLDGA==
-  dependencies:
-    tslib "^2.3.0"
-
 ansi-escapes@^7.0.0:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-7.1.1.tgz#fdd39427a7e5a26233e48a8b4366351629ffea1b"

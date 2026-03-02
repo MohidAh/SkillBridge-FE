@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: '',
+  baseUrl: 'https://skillbridgeapi.thequantumz.com/api/',
   useHash: false,
 };
 

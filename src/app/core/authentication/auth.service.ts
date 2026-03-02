@@ -70,18 +70,28 @@ export class AuthService {
   }
 
   menu() {
-    return iif(() => this.check(), this.loginService.menu(), of([]));
+    // return iif(() => this.check(), this.loginService.menu(), of([]));
+    return of([]); // 👈 disable backend menu call
   }
+
+  // private assignUser() {
+  //   if (!this.check()) {
+  //     return of({}).pipe(tap(user => this.user$.next(user)));
+  //   }
+
+  //   if (!isEmptyObject(this.user$.getValue())) {
+  //     return of(this.user$.getValue());
+  //   }
+
+  //   return this.loginService.user().pipe(tap(user => this.user$.next(user)));
+  // }
 
   private assignUser() {
     if (!this.check()) {
       return of({}).pipe(tap(user => this.user$.next(user)));
     }
 
-    if (!isEmptyObject(this.user$.getValue())) {
-      return of(this.user$.getValue());
-    }
-
-    return this.loginService.user().pipe(tap(user => this.user$.next(user)));
+    // 🚫 Removed backend call for now
+    return of(this.user$.getValue());
   }
 }

@@ -30,7 +30,7 @@
     <!-- Card -->
     <div class="login-card">
       <div class="login-card__header">
-        <h1 class="login-card__title">👋 {{ 'login_title' | translate }}!</h1>
+        <h1 class="login-card__title">👋 Welcome Back!</h1>
         <p class="login-card__subtitle">Sign in to your workspace</p>
       </div>
 
@@ -39,18 +39,18 @@
           <!-- Username -->
           <div class="form-group">
             <mat-form-field appearance="outline" class="login-field w-full">
-              <mat-label>{{ 'username' | translate }}</mat-label>
-              <input matInput placeholder="admin" formControlName="username" required />
-              @if (username.invalid) {
+              <mat-label>{{ 'email' | translate }}</mat-label>
+              <input matInput placeholder="email" formControlName="email" required />
+              @if (email.invalid) {
                 <mat-error>
-                  @if (username.errors?.['required']) {
+                  @if (email.errors?.['required']) {
                     <span>
-                      {{ 'please_enter' | translate }}
-                      <strong>admin</strong>
+                      Please enter your email
+                      <!-- <strong>admin</strong> -->
                     </span>
                   }
-                  @if (username.errors?.['remote']) {
-                    <span>{{ username.errors?.['remote'] }}</span>
+                  @if (email.errors?.['email']) {
+                    <span>{{ email.errors?.['email'] }}</span>
                   }
                 </mat-error>
               }
@@ -63,7 +63,7 @@
               <mat-label>{{ 'password' | translate }}</mat-label>
               <input
                 matInput
-                placeholder="skillbridge@123"
+                placeholder="password"
                 type="password"
                 formControlName="password"
                 required
@@ -72,8 +72,8 @@
                 <mat-error>
                   @if (password.errors?.['required']) {
                     <span>
-                      {{ 'please_enter' | translate }}
-                      <strong>admin</strong>
+                      Please enter your password
+                      <!-- <strong>admin</strong> -->
                     </span>
                   }
                   @if (password.errors?.['remote']) {
@@ -85,16 +85,16 @@
           </div>
 
           <!-- Remember me -->
-          <mat-checkbox class="login-checkbox" formControlName="rememberMe">
-            {{ 'remember_me' | translate }}
-          </mat-checkbox>
+          <!-- <mat-checkbox class="login-checkbox" formControlName="rememberMe">
+           Remember me
+          </mat-checkbox> -->
 
           <!-- Submit -->
           <button
             class="login-btn w-full"
             matButton="filled"
             [disabled]="!!loginForm.invalid"
-            [loading]="isSubmitting"
+            [loading]="isSubmitting()"
             (click)="login()"
           >
             {{ 'login' | translate }}
@@ -102,10 +102,8 @@
 
           <!-- Register link -->
           <div class="login-footer">
-            <span>{{ 'have_no_account' | translate }}?</span>
-            <a routerLink="/auth/register" class="login-footer__link">
-              {{ 'create_one_account' | translate }}
-            </a>
+            <span>Don't have an account?</span>
+            <a routerLink="/auth/register" class="login-footer__link">Create one</a>
           </div>
         </form>
       </mat-card-content>

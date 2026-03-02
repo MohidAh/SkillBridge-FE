@@ -4,7 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { TokenService, User } from '@core/authentication';
 import { LocalStorageService, MemoryStorageService } from '@shared/services/storage.service';
-import { STATUS } from 'angular-in-memory-web-api';
+// when using real backend we no longer need the in-memory status constants
+const UNAUTHORIZED = 401;
 import { BASE_URL } from './base-url-interceptor';
 import { tokenInterceptor } from './token-interceptor';
 
@@ -87,7 +88,7 @@ describe('TokenInterceptor', () => {
     init('', 'token');
     spyOn(tokenService, 'clear');
 
-    mockRequest('/user', {}, { status: STATUS.UNAUTHORIZED, statusText: 'Unauthorized' });
+    mockRequest('/user', {}, { status: UNAUTHORIZED, statusText: 'Unauthorized' });
 
     expect(tokenService.clear).toHaveBeenCalled();
   });

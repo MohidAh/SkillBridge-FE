@@ -79,6 +79,17 @@
             </mat-form-field>
           </div>
 
+          <!-- Role Type -->
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="register-field w-full">
+              <mat-label>Role Type</mat-label>
+              <mat-select formControlName="role" required>
+                <mat-option [value]="UserRole.HIGH_SCHOOL_STUDENT">High school student</mat-option>
+                <mat-option [value]="UserRole.UNIVERSITY_STUDENT">University student</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
           <!-- Password -->
           <div class="form-group">
             <mat-form-field appearance="outline" class="register-field w-full">
@@ -100,7 +111,7 @@
           <!-- Confirm Password -->
           <div class="form-group">
             <mat-form-field appearance="outline" class="register-field w-full">
-              <mat-label>{{ 'confirm_password' | translate }}</mat-label>
+              <mat-label>Confirm Password</mat-label>
               <input matInput type="password" formControlName="confirmPassword" required />
               @if (confirmPassword.touched) {
                 <mat-error>
@@ -128,7 +139,7 @@
 
           <!-- Login link -->
           <div class="register-footer">
-            <span>{{ 'have_an_account' | translate }}?</span>
+            <span>Already have an account?</span>
             <a routerLink="/auth/login" class="register-footer__link">
               {{ 'login' | translate }}
             </a>

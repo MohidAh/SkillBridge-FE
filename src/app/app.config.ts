@@ -19,7 +19,6 @@ import { withFormlyMaterial } from '@ngx-formly/material';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideHotToastConfig } from '@ngxpert/hot-toast';
-import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import {
@@ -31,7 +30,6 @@ import {
 } from '@core';
 import { environment } from '@env/environment';
 import { formlyConfigFactory, PaginatorI18nService } from '@shared';
-import { InMemDataService } from '@shared/in-mem/in-mem-data.service';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -49,16 +47,16 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHotToastConfig(),
     provideTranslateService({
-      loader: provideTranslateHttpLoader({ prefix: 'i18n/', suffix: '.json' }),
+      // don't request files from the API server – load the static json files
+      // shipped with the frontend. the `public` folder is copied to the root of
+      // the build output, so the translation files are served from
+      // `/i18n/<lang>.json`. a leading slash forces HttpClient to make an
+      // absolute request against the current origin instead of using the
+      // configured `baseUrl`, which was causing the 404 against
+      // skillbridgeapi.thequantumz.com/api/i18n/...
+      // loader: provideTranslateHttpLoader({ prefix: '/i18n/', suffix: '.json' }),
     }),
-    importProvidersFrom(
-      NgxPermissionsModule.forRoot(),
-      // 👇 ❌ This is only used for demo purpose, remove it in the realworld application
-      InMemoryWebApiModule.forRoot(InMemDataService, {
-        dataEncapsulation: false,
-        passThruUnknownUrl: true,
-      })
-    ),
+    importProvidersFrom(NgxPermissionsModule.forRoot()),
     provideFormlyCore([...withFormlyMaterial()]),
     {
       provide: FORMLY_CONFIG,

@@ -61,7 +61,6 @@ function copySrcApp() {
     'src/app/**/*',
     '!src/app/core/settings.ts',
     '!src/app/routes/**/*',
-    '!src/app/shared/in-mem/**',
     '!src/app/theme/admin-layout/*.html',
     '!src/app/app.config.ts',
     '!src/app/app.routes.ts',

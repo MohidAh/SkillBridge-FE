@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { AuthService, User } from '@core/authentication';
 import { NgxPermissionsService, NgxRolesService } from 'ngx-permissions';
 import { switchMap, tap } from 'rxjs';
-import { UserRole } from '@shared/enums/userRole.enums';
+import { UserRole } from '@shared/enums/user.enums';
 import { Menu, MenuService } from './menu.service';
 
 @Injectable({
@@ -60,11 +60,11 @@ export class StartupService {
   }
 
   private getRolePermission(roleId?: number) {
-    if (roleId === UserRole.Admin) {
+    if (roleId === UserRole.SUPER_ADMIN) {
       return 'ADMIN';
     }
 
-    if (roleId === UserRole.User) {
+    if (roleId === UserRole.UNIVERSITY_STUDENT || roleId === UserRole.HIGH_SCHOOL_STUDENT) {
       return 'USER';
     }
 

@@ -65,7 +65,7 @@
         <mat-label>Education Level</mat-label>
         <mat-select formControlName="educationLevel">
           @for (level of educationLevels; track level) {
-            <mat-option [value]="level">{{ level }}</mat-option>
+            <mat-option [value]="level.value">{{ level.label }}</mat-option>
           }
         </mat-select>
         @if (form.get('educationLevel')?.invalid && form.get('educationLevel')?.touched) {
@@ -111,7 +111,12 @@
 
     <!-- Actions -->
     <div class="step-actions">
-      <button type="submit" matButton="filled" class="btn-next" [disabled]="form.invalid">
+      <button
+        type="submit"
+        matButton="filled"
+        class="btn-next"
+        [disabled]="form.invalid || isSubmitting()"
+      >
         Continue
         <mat-icon>arrow_forward</mat-icon>
       </button>

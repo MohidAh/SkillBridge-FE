@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -9,9 +9,13 @@ import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { MtxButtonModule } from '@ng-matero/extensions/button';
 import { TranslateModule } from '@ngx-translate/core';
-import { filter } from 'rxjs/operators';
+import { catchError, filter, finalize } from 'rxjs/operators';
 
-import { AuthService } from '@core/authentication';
+import { ApiInterface, AuthResponse, AuthService, TokenService } from '@core/authentication';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HotToastService } from '@ngxpert/hot-toast';
+import { of } from 'rxjs';
+import { ApiClientService } from '@shared/services/api-client.service';
 
 @Component({
   selector: 'app-login',
@@ -33,18 +37,21 @@ import { AuthService } from '@core/authentication';
 export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly auth = inject(AuthService);
+  private readonly http = inject(ApiClientService);
+  private readonly toast = inject(HotToastService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly tokenService = inject(TokenService);
 
-  isSubmitting = false;
+  isSubmitting = signal<boolean>(false);
 
   loginForm = this.fb.nonNullable.group({
-    username: ['recca0120', [Validators.required]],
-    password: ['password', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
     rememberMe: [false],
   });
 
-  get username() {
-    return this.loginForm.get('username')!;
+  get email() {
+    return this.loginForm.get('email')!;
   }
   get password() {
     return this.loginForm.get('password')!;
@@ -53,35 +60,49 @@ export class Login {
     return this.loginForm.get('rememberMe')!;
   }
 
-  login() {
-    this.isSubmitting = true;
+  login(): void {
+    if (!this.email.value || !this.password.value) return;
 
-    this.auth
-      .login(this.username.value, this.password.value, this.rememberMe.value)
-      .pipe(filter(authenticated => authenticated))
-      .subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          // Redirect to onboarding if profile not yet complete
-          const profileComplete = this.auth.getUserSnapshot()?.['profileComplete'];
-          if (!profileComplete) {
-            this.router.navigateByUrl('/onboarding');
-          } else {
-            this.router.navigateByUrl('/');
-          }
-        },
-        error: (errorRes: HttpErrorResponse) => {
-          if (errorRes.status === 422) {
-            const form = this.loginForm;
-            const errors = errorRes.error.errors;
-            Object.keys(errors).forEach(key => {
-              form.get(key === 'email' ? 'username' : key)?.setErrors({
-                remote: errors[key][0],
-              });
-            });
-          }
-          this.isSubmitting = false;
-        },
+    this.isSubmitting.set(true);
+
+    this.http
+      .post<ApiInterface<AuthResponse>>('auth/login', {
+        email: this.email.value,
+        password: this.password.value,
+        rememberMe: this.rememberMe.value,
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+
+        catchError(err => {
+          this.toast.error(err?.error?.message || 'Login failed. Please try again.');
+
+          return of<ApiInterface<AuthResponse>>({
+            status: 'error',
+            message: err?.error?.message || 'Login failed',
+            data: null as unknown as AuthResponse,
+            errorCode: err?.error?.errorCode ?? -1,
+          });
+        }),
+
+        finalize(() => {
+          this.isSubmitting.set(false);
+        })
+      )
+      .subscribe(res => {
+        if (res.status !== 'success' || !res.data) return;
+
+        // this.persistAuth(res.data, this.rememberMe.value);
+
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        this.tokenService.set({
+          access_token: res.data.token, // must match backend property
+          // refresh_token: res.data.expiresInMinutes, // if provided
+          expires_in: res.data.expiresInMinutes, // required for expiration logic
+          token_type: 'Bearer',
+        });
+        this.toast.success('Login successful!');
+        this.router.navigate(['/dashboard']);
       });
   }
 }
