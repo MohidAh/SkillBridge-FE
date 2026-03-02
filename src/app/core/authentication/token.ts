@@ -13,11 +13,15 @@ export abstract class BaseToken {
   }
 
   get token_type() {
-    return this.attributes.token_type ?? 'bearer';
+    return this.attributes.token_type ?? 'Bearer';
   }
 
   get exp() {
     return this.attributes.exp;
+  }
+
+  get claims(): any {
+    return {};
   }
 
   valid() {
@@ -65,6 +69,10 @@ export class JwtToken extends SimpleToken {
 
   override get exp() {
     return this.payload?.exp;
+  }
+
+  override get claims() {
+    return this.payload;
   }
 
   private get payload(): { exp?: number } {

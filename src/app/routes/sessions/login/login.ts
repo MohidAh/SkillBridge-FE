@@ -38,13 +38,13 @@ export class Login {
   isSubmitting = false;
 
   loginForm = this.fb.nonNullable.group({
-    username: ['recca0120', [Validators.required]],
-    password: ['password', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
     rememberMe: [false],
   });
 
-  get username() {
-    return this.loginForm.get('username')!;
+  get email() {
+    return this.loginForm.get('email')!;
   }
   get password() {
     return this.loginForm.get('password')!;
@@ -57,7 +57,7 @@ export class Login {
     this.isSubmitting = true;
 
     this.auth
-      .login(this.username.value, this.password.value, this.rememberMe.value)
+      .login(this.email.value, this.password.value, this.rememberMe.value)
       .pipe(filter(authenticated => authenticated))
       .subscribe({
         next: () => {
@@ -75,7 +75,7 @@ export class Login {
             const form = this.loginForm;
             const errors = errorRes.error.errors;
             Object.keys(errors).forEach(key => {
-              form.get(key === 'email' ? 'username' : key)?.setErrors({
+              form.get(key)?.setErrors({
                 remote: errors[key][0],
               });
             });

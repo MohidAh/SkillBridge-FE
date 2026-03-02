@@ -1,89 +1,81 @@
-import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { tap } from 'rxjs';
 import {
   OnboardingApiService,
   PersonalInfoPayload,
-  AcademicInfoPayload,
-  SkillsPayload,
   AssessmentPayload,
+  PersonalityResult,
 } from './onboarding-api.service';
 import { AuthService } from '@core/authentication/auth.service';
 
 export interface OnboardingState {
   currentStep: number;
   personalInfo: PersonalInfoPayload | null;
-  academicInfo: AcademicInfoPayload | null;
-  skills: SkillsPayload | null;
   assessment: AssessmentPayload | null;
+  personalityResult: PersonalityResult | null;
 }
 
 const INITIAL_STATE: OnboardingState = {
   currentStep: 0,
   personalInfo: null,
-  academicInfo: null,
-  skills: null,
   assessment: null,
+  personalityResult: null,
 };
 
 @Injectable({ providedIn: 'root' })
 export class OnboardingService {
   private readonly api = inject(OnboardingApiService);
   private readonly auth = inject(AuthService);
-  private state$ = new BehaviorSubject<OnboardingState>(INITIAL_STATE);
+  private readonly _state = signal<OnboardingState>(INITIAL_STATE);
 
-  get state() {
-    return this.state$.asObservable();
-  }
-
+  readonly state = computed(() => this._state());
+  readonly currentStep = computed(() => this._state().currentStep);
   get snapshot() {
-    return this.state$.getValue();
+    return this._state();
   }
 
-  get currentStep() {
-    return this.snapshot.currentStep;
-  }
+  // No changes needed for these computed getters if I kept them, but I'll update logic
 
   nextStep() {
-    const s = this.snapshot;
-    this.state$.next({ ...s, currentStep: s.currentStep + 1 });
+    this._state.update(s => ({ ...s, currentStep: s.currentStep + 1 }));
   }
 
   prevStep() {
-    const s = this.snapshot;
-    if (s.currentStep > 0) {
-      this.state$.next({ ...s, currentStep: s.currentStep - 1 });
-    }
+    this._state.update(s => ({
+      ...s,
+      currentStep: Math.max(0, s.currentStep - 1),
+    }));
   }
 
   savePersonalInfo(data: PersonalInfoPayload) {
-    this.state$.next({ ...this.snapshot, personalInfo: data });
-
-    const currentUser = this.auth.getUserSnapshot();
-    const updatedUser = { ...currentUser, ...data };
-
-    this.auth.setUser(updatedUser);
+    return this.api.savePersonalInfo(data).pipe(
+      tap(() => {
+        this._state.update(s => ({ ...s, personalInfo: data }));
+        const currentUser = this.auth.getUserSnapshot();
+        const updatedUser = { ...currentUser, ...data };
+        this.auth.setUser(updatedUser);
+      })
+    );
   }
 
-  saveAcademicInfo(data: AcademicInfoPayload) {
-    this.state$.next({ ...this.snapshot, academicInfo: data });
-
-    const currentUser = this.auth.getUserSnapshot();
-    const updatedUser = { ...currentUser, ...data };
-
-    this.auth.setUser(updatedUser);
+  updatePersonalInfo(data: PersonalInfoPayload) {
+    return this.api.updatePersonalInfo(data).pipe(
+      tap(() => {
+        this._state.update(s => ({ ...s, personalInfo: data }));
+        const currentUser = this.auth.getUserSnapshot();
+        const updatedUser = { ...currentUser, ...data };
+        this.auth.setUser(updatedUser);
+      })
+    );
   }
 
-  saveSkills(data: SkillsPayload) {
-    this.state$.next({ ...this.snapshot, skills: data });
-
-    const currentUser = this.auth.getUserSnapshot();
-    const updatedUser = { ...currentUser, ...data };
-
-    this.auth.setUser(updatedUser);
+  /** Update in-memory state from a preloaded API response (no HTTP call) */
+  patchPersonalInfo(data: PersonalInfoPayload) {
+    this._state.update(s => ({ ...s, personalInfo: data }));
   }
 
   saveAssessment(data: AssessmentPayload) {
-    this.state$.next({ ...this.snapshot, assessment: data });
+    this._state.update(s => ({ ...s, assessment: data }));
 
     const currentUser = this.auth.getUserSnapshot();
     const updatedUser = { ...currentUser, assessment: data };
@@ -97,6 +89,21 @@ export class OnboardingService {
 
   reset() {
     localStorage.removeItem('profileComplete');
-    this.state$.next(INITIAL_STATE);
+    this._state.set(INITIAL_STATE);
+  }
+
+  savePersonalityResult(data: PersonalityResult) {
+    this._state.update(s => ({ ...s, personalityResult: data }));
+    const currentUser = this.auth.getUserSnapshot();
+    const updatedUser = { ...currentUser, personalityResult: data };
+    this.auth.setUser(updatedUser);
+  }
+
+  patchPersonalityResult(data: PersonalityResult) {
+    this._state.update(s => ({ ...s, personalityResult: data }));
+  }
+
+  updateState(patch: Partial<OnboardingState>) {
+    this._state.update(s => ({ ...s, ...patch }));
   }
 }

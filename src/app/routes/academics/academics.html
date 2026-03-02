@@ -31,7 +31,7 @@
           </div>
         }
       </div>
-    } @else if (dataSource().length === 0) {
+    } @else if (allRecords.length === 0) {
       <div class="empty-state hvr-glow">
         <div class="empty-icon-wrapper">
           <mat-icon>history_edu</mat-icon>
@@ -48,25 +48,28 @@
       </div>
     } @else {
       <div class="subjects-grid">
-        @for (item of dataSource(); track item.institution) {
+        @for (item of allRecords; track item.id) {
           <div class="subject-card-wrapper">
-            <mat-card class="subject-card hvr-lift">
+            <mat-card class="subject-card hvr-lift" [class.primary-card]="item.isPrimary">
               <mat-card-header>
                 <div class="card-top-row">
                   <span class="subject-code">
-                    {{ item.yearBatch ? item.yearBatch + ' Year' : '' }}
+                    {{ item.gradeLevel ? 'Year ' + item.gradeLevel : '' }}
+                    {{ item.batchYear ? 'Year ' + item.batchYear : '' }}
                   </span>
-                  <mat-chip class="status-badge university">
-                    {{ item.type === 'university' ? 'University' : 'High School' }}
-                  </mat-chip>
+                  @if (item.isPrimary) {
+                    <mat-chip class="status-badge primary">⭐ Primary</mat-chip>
+                  } @else {
+                    <mat-chip class="status-badge university">History</mat-chip>
+                  }
                 </div>
               </mat-card-header>
 
               <mat-card-content class="m-t-16">
-                <h3 class="subject-title">{{ item.degree }}</h3>
+                <h3 class="subject-title">{{ item.programName }}</h3>
                 <div class="institution-info m-b-12">
                   <mat-icon>school</mat-icon>
-                  <span>{{ item.institution }}</span>
+                  <span>{{ item.institutionName }}</span>
                 </div>
                 @if (item.major) {
                   <div class="major-info">
@@ -77,8 +80,21 @@
               </mat-card-content>
 
               <mat-card-actions align="end" class="p-16">
+                @if (!item.isPrimary) {
+                  <button
+                    mat-icon-button
+                    (click)="makePrimary(item)"
+                    title="Set as Primary"
+                    class="edit-btn"
+                  >
+                    <mat-icon>star_outline</mat-icon>
+                  </button>
+                }
                 <button mat-icon-button (click)="edit(item)" title="Edit Record" class="edit-btn">
                   <mat-icon>edit_note</mat-icon>
+                </button>
+                <button mat-icon-button (click)="delete(item)" title="Delete Record" color="warn">
+                  <mat-icon>delete_outline</mat-icon>
                 </button>
               </mat-card-actions>
             </mat-card>

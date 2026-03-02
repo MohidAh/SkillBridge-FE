@@ -1,9 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map } from 'rxjs';
-
-import { Menu } from '@core';
-import { Token, User } from './interface';
+import { ApiResponse, AuthData, Token } from './interface';
 
 @Injectable({
   providedIn: 'root',
@@ -11,23 +8,27 @@ import { Token, User } from './interface';
 export class LoginService {
   protected readonly http = inject(HttpClient);
 
-  login(username: string, password: string, rememberMe = false) {
-    return this.http.post<Token>('/auth/login', { username, password, rememberMe });
+  login(email: string, password: string, rememberMe = false) {
+    return this.http.post<ApiResponse<AuthData>>('/api/Auth/login', {
+      email,
+      password,
+      rememberMe,
+    });
+  }
+
+  register(params: any) {
+    return this.http.post<ApiResponse<AuthData>>('/api/Auth/register', params);
   }
 
   refresh(params: Record<string, any>) {
-    return this.http.post<Token>('/auth/refresh', params);
+    return this.http.post<Token>('/api/Auth/refresh', params);
   }
 
   logout() {
-    return this.http.post<any>('/auth/logout', {});
+    return this.http.post<any>('/api/Auth/logout', {});
   }
 
-  user() {
-    return this.http.get<User>('/user');
-  }
-
-  menu() {
-    return this.http.get<{ menu: Menu[] }>('/user/menu').pipe(map(res => res.menu));
+  getUser(id: string) {
+    return this.http.get<ApiResponse<any>>(`/api/Users/${id}`);
   }
 }

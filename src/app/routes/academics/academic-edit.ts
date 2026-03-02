@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -6,131 +6,115 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
-import { OnboardingApiService } from '../onboarding/onboarding-api.service';
-import { Observable, of } from 'rxjs';
+import {
+  AcademicRecord,
+  InstitutionItem,
+  OnboardingApiService,
+  ProgramItem,
+} from '../onboarding/onboarding-api.service';
 import { AuthService } from '@core';
+import { EducationLevel } from '@shared/enums/education-level.enums';
+
+export interface AcademicEditDialogData {
+  record: AcademicRecord | null;
+}
+
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-academic-edit',
   template: `
-    <h2 mat-dialog-title class="m-b-16">{{ data ? 'Edit' : 'Add' }} Academic Record</h2>
+    <h2 mat-dialog-title class="m-b-16">{{ data.record ? 'Edit' : 'Add' }} Academic Record</h2>
     <mat-dialog-content>
-      <form [formGroup]="form" class="flex flex-col gap-4 mt-4">
+      <form [formGroup]="degreeForm" class="flex flex-col gap-4 mt-4">
         <div class="row">
-          <!-- Institution / University -->
+          <!-- Institution -->
           <div class="col-12 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>
-                {{ isHighSchool ? 'Institution / School' : 'Institution / University' }}
+                {{ isHighSchool() ? 'School / Institution' : 'University / Institution' }}
               </mat-label>
-              <mat-select formControlName="institution">
-                @for (inst of institutions$ | async; track inst) {
-                  <mat-option [value]="inst">{{ inst }}</mat-option>
+              <mat-select formControlName="institutionId">
+                @for (inst of institutions(); track inst.id) {
+                  <mat-option [value]="inst.id">{{ inst.name }}</mat-option>
                 }
               </mat-select>
-              @if (form.get('institution')?.invalid && form.get('institution')?.touched) {
+              @if (
+                degreeForm.get('institutionId')?.invalid && degreeForm.get('institutionId')?.touched
+              ) {
                 <mat-error>Required</mat-error>
               }
             </mat-form-field>
           </div>
 
-          <!-- Degree -->
+          <!-- Program -->
           <div class="col-md-6 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>{{ isHighSchool ? 'Degree / Certificate' : 'Degree' }}</mat-label>
-              @if (isHighSchool) {
-                <mat-select formControlName="degree">
-                  <mat-option value="Matriculation">Matriculation</mat-option>
-                  <mat-option value="Intermediate">Intermediate</mat-option>
-                  <mat-option value="O Levels">O Levels</mat-option>
-                  <mat-option value="A Levels">A Levels</mat-option>
-                  <mat-option value="Other">Other</mat-option>
-                </mat-select>
-              } @else {
-                <mat-select formControlName="degree">
-                  @for (d of degrees$ | async; track d) {
-                    <mat-option [value]="d">{{ d }}</mat-option>
-                  }
-                </mat-select>
-              }
-              @if (form.get('degree')?.invalid && form.get('degree')?.touched) {
-                <mat-error>Required</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <!-- Year -->
-          <div class="col-md-6 m-b-16">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Year</mat-label>
-              <mat-select formControlName="yearBatch">
-                @for (b of isHighSchool ? highSchoolYears : batches; track b.value) {
-                  <mat-option [value]="b.value">{{ b.label }}</mat-option>
+              <mat-label>
+                {{ isHighSchool() ? 'Degree / Certificate' : 'Degree / Program' }}
+              </mat-label>
+              <mat-select formControlName="institutionProgramId">
+                @for (p of programs(); track p.id) {
+                  <mat-option [value]="p.id">{{ p.name }}</mat-option>
                 }
               </mat-select>
-              @if (form.get('yearBatch')?.invalid && form.get('yearBatch')?.touched) {
+              @if (
+                degreeForm.get('institutionProgramId')?.invalid &&
+                degreeForm.get('institutionProgramId')?.touched
+              ) {
                 <mat-error>Required</mat-error>
               }
             </mat-form-field>
           </div>
 
-          @if (isHighSchool) {
-            <!-- Education System -->
-            <div class="col-md-12 m-b-16">
+          <div class="col-md-6 m-b-16 flex gap-2">
+            <!-- Year / Grade (HS Only) -->
+            @if (isHighSchool()) {
               <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Education System</mat-label>
-                <mat-select formControlName="educationSystem">
-                  @for (es of educationSystems; track es) {
-                    <mat-option [value]="es">{{ es }}</mat-option>
+                <mat-label>Year / Grade</mat-label>
+                <mat-select formControlName="gradeLevel">
+                  @for (y of highSchoolYears; track y.value) {
+                    <mat-option [value]="y.value">{{ y.label }}</mat-option>
                   }
                 </mat-select>
-                @if (form.get('educationSystem')?.invalid && form.get('educationSystem')?.touched) {
+              </mat-form-field>
+            }
+
+            <!-- University Year or HS Batch Year -->
+            @if (!isHighSchool()) {
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Current Year</mat-label>
+                <mat-select formControlName="batchYear">
+                  @for (y of universityYears; track y.value) {
+                    <mat-option [value]="y.value">{{ y.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            } @else {
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Batch Year</mat-label>
+                <input matInput type="number" formControlName="batchYear" placeholder="e.g. 2022" />
+                @if (degreeForm.get('batchYear')?.invalid && degreeForm.get('batchYear')?.touched) {
                   <mat-error>Required</mat-error>
                 }
               </mat-form-field>
-            </div>
-          } @else {
-            <!-- Major / Field of Study -->
-            <div class="col-md-12 m-b-16">
+            }
+          </div>
+
+          <!-- Major (non-HS) -->
+          @if (!isHighSchool()) {
+            <div class="col-12 m-b-16">
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Major / Field of Study</mat-label>
                 <input matInput formControlName="major" placeholder="e.g. Computer Science" />
-                @if (form.get('major')?.invalid && form.get('major')?.touched) {
+                @if (degreeForm.get('major')?.invalid && degreeForm.get('major')?.touched) {
                   <mat-error>Required</mat-error>
                 }
               </mat-form-field>
             </div>
           }
-
-          <!-- File Upload -->
-          <div class="col-12 m-b-16">
-            <label for="fileInput" class="field-label m-b-8 d-block">
-              Degree Certificate (optional)
-            </label>
-            <input
-              id="fileInput"
-              #fileInput
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              class="hidden"
-              (change)="onFileSelected($event)"
-            />
-            <div
-              class="file-upload-box hvr-lift"
-              (click)="fileInput.click()"
-              (keyup.enter)="fileInput.click()"
-              tabindex="0"
-            >
-              @if (selectedFileName) {
-                <mat-icon class="text-success">check_circle</mat-icon>
-                <span class="file-name">{{ selectedFileName }}</span>
-              } @else {
-                <mat-icon>upload_file</mat-icon>
-                <span>Click to upload Certificate/Transcript</span>
-              }
-            </div>
-          </div>
         </div>
       </form>
     </mat-dialog-content>
@@ -140,10 +124,13 @@ import { AuthService } from '@core';
         mat-flat-button
         color="primary"
         (click)="onSave()"
-        [disabled]="form.invalid"
+        [disabled]="degreeForm.invalid || isSaving()"
         class="save-btn hvr-lift"
       >
-        {{ data ? 'Update' : 'Save' }} Record
+        @if (isSaving()) {
+          <mat-spinner diameter="18" style="display:inline-block;margin-right:8px" />
+        }
+        {{ data.record ? 'Update' : 'Save' }} Record
       </button>
     </mat-dialog-actions>
   `,
@@ -155,46 +142,6 @@ import { AuthService } from '@core';
       }
       .w-full {
         width: 100%;
-      }
-      .hidden {
-        display: none;
-      }
-      .field-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--mat-sys-on-surface-variant);
-      }
-      .file-upload-box {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 16px;
-        background: var(--mat-sys-surface-container-high);
-        border: 1px dashed var(--mat-sys-outline);
-        border-radius: 16px;
-        cursor: pointer;
-        color: var(--mat-sys-on-surface-variant);
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: rgb(from var(--mat-sys-primary) r g b / 0.05);
-          border-color: var(--mat-sys-primary);
-        }
-
-        mat-icon {
-          font-size: 24px;
-          width: 24px;
-          height: 24px;
-          color: var(--mat-sys-primary);
-        }
-        .text-success {
-          color: #10b981 !important;
-        }
-        .file-name {
-          font-weight: 600;
-          color: var(--mat-sys-on-surface);
-        }
       }
       .save-btn {
         height: 44px;
@@ -213,6 +160,7 @@ import { AuthService } from '@core';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
   ],
 })
 export class AcademicEdit implements OnInit {
@@ -220,80 +168,81 @@ export class AcademicEdit implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<AcademicEdit>);
   private readonly api = inject(OnboardingApiService);
   private readonly auth = inject(AuthService);
-  readonly data = inject(MAT_DIALOG_DATA);
+  private readonly toast = inject(HotToastService);
+  readonly data = inject<AcademicEditDialogData>(MAT_DIALOG_DATA);
 
-  institutions$!: Observable<string[]>;
-  degrees$!: Observable<string[]>;
+  institutions = signal<InstitutionItem[]>([]);
+  programs = signal<ProgramItem[]>([]);
+  isSaving = signal(false);
 
-  readonly batches = [
-    { label: '1st Year', value: '1' },
-    { label: '2nd Year', value: '2' },
-    { label: '3rd Year', value: '3' },
-    { label: '4th Year', value: '4' },
-    { label: '5th Year', value: '5' },
-    { label: '6th Year', value: '6' },
+  educationLevel = signal<EducationLevel>(EducationLevel.University);
+  isHighSchool = computed(() => this.educationLevel() === EducationLevel.HighSchool);
+
+  readonly universityYears = [
+    { label: 'Year 1', value: 1 },
+    { label: 'Year 2', value: 2 },
+    { label: 'Year 3', value: 3 },
+    { label: 'Year 4', value: 4 },
   ];
 
   readonly highSchoolYears = [
-    { label: '1st Year', value: '1' },
-    { label: '2nd Year', value: '2' },
+    { label: '1st Year', value: 1 },
+    { label: '2nd Year', value: 2 },
   ];
 
-  readonly educationSystems = ['O Levels', 'A Levels', 'Intermediate', 'Matriculation', 'Other'];
-
-  isHighSchool = false;
-
-  selectedFileName: string | null = this.data?.degreeFileUrl || null;
-
-  form = this.fb.group({
-    institution: [this.data?.institution || '', Validators.required],
-    degree: [this.data?.degree || '', Validators.required],
-    yearBatch: [this.data?.yearBatch || '', Validators.required],
-    major: [this.data?.major || ''],
-    educationSystem: [this.data?.educationSystem || ''],
-    type: [this.data?.type || 'university'],
+  degreeForm = this.fb.nonNullable.group({
+    institutionId: ['', Validators.required],
+    institutionProgramId: ['', Validators.required],
+    batchYear: [0, Validators.required],
+    gradeLevel: [null as any as number],
+    major: [''],
   });
 
   ngOnInit() {
-    // Determine if high school based on data or user profile
+    // Determine initial education level from user state
     const user = this.auth.getUserSnapshot();
-    this.isHighSchool =
-      this.data?.type === 'high_school' || user?.['personalInfo']?.educationLevel === 'High School';
+    const eduLevel = user?.['educationLevel'] ?? EducationLevel.University;
+    this.educationLevel.set(eduLevel);
 
-    if (this.isHighSchool) {
-      if (!this.data) this.form.get('type')?.setValue('high_school');
-      this.form.get('educationSystem')?.setValidators(Validators.required);
-      this.form.get('major')?.clearValidators();
-    } else {
-      if (!this.data) this.form.get('type')?.setValue('university');
-      this.form.get('major')?.setValidators(Validators.required);
-      this.form.get('educationSystem')?.clearValidators();
+    // Prefill if editing
+    const rec = this.data?.record;
+    if (rec) {
+      this.educationLevel.set(rec.educationLevel);
+      this.degreeForm.patchValue({
+        institutionId: rec.institutionId,
+        institutionProgramId: rec.institutionProgramId,
+        batchYear: rec.batchYear,
+        gradeLevel: rec.gradeLevel,
+        major: rec.major ?? '',
+      });
     }
-    this.form.updateValueAndValidity();
 
-    this.institutions$ = this.api.getInstitutions();
+    this.setupConditionalValidators();
 
-    // Handle dependent degree select
-    this.form.get('institution')?.valueChanges.subscribe(inst => {
-      if (inst) {
-        this.degrees$ = this.api.getDegrees(inst);
-      } else {
-        this.degrees$ = of([]);
+    // Load lookup data
+    this.api.getInstitutions(this.educationLevel()).subscribe(res => {
+      if (res.status === 'success') {
+        this.institutions.set(res.data?.items ?? []);
       }
     });
-
-    // If editing, trigger degree load
-    if (this.data?.institution) {
-      this.degrees$ = this.api.getDegrees(this.data.institution);
-    }
+    this.api.getPrograms(this.educationLevel()).subscribe(res => {
+      if (res.status === 'success') {
+        this.programs.set(res.data?.items ?? []);
+      }
+    });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      this.selectedFileName = file.name;
+  private setupConditionalValidators() {
+    const { gradeLevel, major } = this.degreeForm.controls;
+    gradeLevel.clearValidators();
+    major.clearValidators();
+    if (this.isHighSchool()) {
+      gradeLevel.setValidators(Validators.required);
+    } else {
+      major.setValidators(Validators.required);
     }
+    gradeLevel.updateValueAndValidity();
+    major.updateValueAndValidity();
   }
 
   onCancel() {
@@ -301,12 +250,61 @@ export class AcademicEdit implements OnInit {
   }
 
   onSave() {
-    if (this.form.valid) {
-      const result = {
-        ...this.form.getRawValue(),
-        degreeFileUrl: this.selectedFileName,
+    if (this.degreeForm.invalid) {
+      this.degreeForm.markAllAsTouched();
+      return;
+    }
+
+    const v = this.degreeForm.getRawValue();
+    this.isSaving.set(true);
+
+    const rec = this.data?.record;
+
+    if (rec) {
+      // Update
+      const payload = {
+        institutionId: v.institutionId,
+        institutionProgramId: v.institutionProgramId,
+        batchYear: v.batchYear,
+        ...(this.isHighSchool() ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
       };
-      this.dialogRef.close(result);
+      this.api.updateAcademic(rec.id, payload).subscribe({
+        next: res => {
+          this.isSaving.set(false);
+          if (res.status === 'success' && res.data) {
+            this.toast.success(res.message || 'Record updated');
+            this.dialogRef.close(res.data);
+          } else {
+            this.toast.error(res.message || 'Failed to update record');
+          }
+        },
+        error: () => {
+          this.isSaving.set(false);
+        },
+      });
+    } else {
+      // Create
+      const payload = {
+        educationLevel: this.educationLevel(),
+        institutionId: v.institutionId,
+        institutionProgramId: v.institutionProgramId,
+        batchYear: v.batchYear,
+        ...(this.isHighSchool() ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
+      };
+      this.api.createAcademic(payload).subscribe({
+        next: res => {
+          this.isSaving.set(false);
+          if (res.status === 'success' && res.data) {
+            this.toast.success(res.message || 'Record saved');
+            this.dialogRef.close(res.data);
+          } else {
+            this.toast.error(res.message || 'Failed to save record');
+          }
+        },
+        error: () => {
+          this.isSaving.set(false);
+        },
+      });
     }
   }
 }

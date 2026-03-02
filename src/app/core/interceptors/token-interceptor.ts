@@ -33,7 +33,7 @@ export function tokenInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
     return next(
       req.clone({
         headers: req.headers.append('Authorization', tokenService.getBearerToken()),
-        withCredentials: true,
+        // withCredentials: true,
       })
     ).pipe(
       catchError((error: HttpErrorResponse) => {

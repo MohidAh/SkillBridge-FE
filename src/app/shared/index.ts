@@ -18,3 +18,6 @@ export * from './interfaces';
 
 // Formly
 export * from './formly-config';
+
+// Validators
+export * from './validators/app-validators';
