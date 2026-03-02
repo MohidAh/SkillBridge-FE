@@ -38,8 +38,8 @@ export class Login {
   isSubmitting = false;
 
   loginForm = this.fb.nonNullable.group({
-    email: ['admin@example.com', [Validators.required, Validators.email]],
-    password: ['password', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
     rememberMe: [false],
   });
 

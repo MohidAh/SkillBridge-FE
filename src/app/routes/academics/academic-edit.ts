@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -28,20 +28,22 @@ import { HotToastService } from '@ngxpert/hot-toast';
   template: `
     <h2 mat-dialog-title class="m-b-16">{{ data.record ? 'Edit' : 'Add' }} Academic Record</h2>
     <mat-dialog-content>
-      <form [formGroup]="form" class="flex flex-col gap-4 mt-4">
+      <form [formGroup]="degreeForm" class="flex flex-col gap-4 mt-4">
         <div class="row">
           <!-- Institution -->
           <div class="col-12 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>
-                {{ isHighSchool ? 'Institution / School' : 'Institution / University' }}
+                {{ isHighSchool() ? 'School / Institution' : 'University / Institution' }}
               </mat-label>
               <mat-select formControlName="institutionId">
-                @for (inst of institutions; track inst.id) {
+                @for (inst of institutions(); track inst.id) {
                   <mat-option [value]="inst.id">{{ inst.name }}</mat-option>
                 }
               </mat-select>
-              @if (form.get('institutionId')?.invalid && form.get('institutionId')?.touched) {
+              @if (
+                degreeForm.get('institutionId')?.invalid && degreeForm.get('institutionId')?.touched
+              ) {
                 <mat-error>Required</mat-error>
               }
             </mat-form-field>
@@ -51,62 +53,63 @@ import { HotToastService } from '@ngxpert/hot-toast';
           <div class="col-md-6 m-b-16">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>
-                {{ isHighSchool ? 'Degree / Certificate' : 'Degree / Program' }}
+                {{ isHighSchool() ? 'Degree / Certificate' : 'Degree / Program' }}
               </mat-label>
-              @if (isHighSchool) {
-                <mat-select formControlName="institutionProgramId">
-                  <mat-option value="matric">Matriculation</mat-option>
-                  <mat-option value="intermediate">Intermediate</mat-option>
-                  <mat-option value="olevels">O Levels</mat-option>
-                  <mat-option value="alevels">A Levels</mat-option>
-                  <mat-option value="other">Other</mat-option>
-                </mat-select>
-              } @else {
-                <mat-select formControlName="institutionProgramId">
-                  @for (p of programs; track p.id) {
-                    <mat-option [value]="p.id">{{ p.name }}</mat-option>
-                  }
-                </mat-select>
-              }
+              <mat-select formControlName="institutionProgramId">
+                @for (p of programs(); track p.id) {
+                  <mat-option [value]="p.id">{{ p.name }}</mat-option>
+                }
+              </mat-select>
               @if (
-                form.get('institutionProgramId')?.invalid &&
-                form.get('institutionProgramId')?.touched
+                degreeForm.get('institutionProgramId')?.invalid &&
+                degreeForm.get('institutionProgramId')?.touched
               ) {
                 <mat-error>Required</mat-error>
               }
             </mat-form-field>
           </div>
 
-          <!-- Year / Grade -->
-          <div class="col-md-6 m-b-16">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>{{ isHighSchool ? 'Year / Grade' : 'Current Year' }}</mat-label>
-              <mat-select formControlName="gradeLevel">
-                @for (b of isHighSchool ? highSchoolYears : batches; track b.value) {
-                  <mat-option [value]="b.value">{{ b.label }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-          </div>
+          <div class="col-md-6 m-b-16 flex gap-2">
+            <!-- Year / Grade (HS Only) -->
+            @if (isHighSchool()) {
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Year / Grade</mat-label>
+                <mat-select formControlName="gradeLevel">
+                  @for (y of highSchoolYears; track y.value) {
+                    <mat-option [value]="y.value">{{ y.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
 
-          <!-- Batch Year -->
-          <div class="col-md-6 m-b-16">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Batch Year</mat-label>
-              <input matInput type="number" formControlName="batchYear" placeholder="e.g. 2022" />
-              @if (form.get('batchYear')?.invalid && form.get('batchYear')?.touched) {
-                <mat-error>Required</mat-error>
-              }
-            </mat-form-field>
+            <!-- University Year or HS Batch Year -->
+            @if (!isHighSchool()) {
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Current Year</mat-label>
+                <mat-select formControlName="batchYear">
+                  @for (y of universityYears; track y.value) {
+                    <mat-option [value]="y.value">{{ y.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            } @else {
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Batch Year</mat-label>
+                <input matInput type="number" formControlName="batchYear" placeholder="e.g. 2022" />
+                @if (degreeForm.get('batchYear')?.invalid && degreeForm.get('batchYear')?.touched) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+            }
           </div>
 
           <!-- Major (non-HS) -->
-          @if (!isHighSchool) {
-            <div class="col-md-6 m-b-16">
+          @if (!isHighSchool()) {
+            <div class="col-12 m-b-16">
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Major / Field of Study</mat-label>
                 <input matInput formControlName="major" placeholder="e.g. Computer Science" />
-                @if (form.get('major')?.invalid && form.get('major')?.touched) {
+                @if (degreeForm.get('major')?.invalid && degreeForm.get('major')?.touched) {
                   <mat-error>Required</mat-error>
                 }
               </mat-form-field>
@@ -121,10 +124,10 @@ import { HotToastService } from '@ngxpert/hot-toast';
         mat-flat-button
         color="primary"
         (click)="onSave()"
-        [disabled]="form.invalid || isSaving"
+        [disabled]="degreeForm.invalid || isSaving()"
         class="save-btn hvr-lift"
       >
-        @if (isSaving) {
+        @if (isSaving()) {
           <mat-spinner diameter="18" style="display:inline-block;margin-right:8px" />
         }
         {{ data.record ? 'Update' : 'Save' }} Record
@@ -168,73 +171,72 @@ export class AcademicEdit implements OnInit {
   private readonly toast = inject(HotToastService);
   readonly data = inject<AcademicEditDialogData>(MAT_DIALOG_DATA);
 
-  institutions: InstitutionItem[] = [];
-  programs: ProgramItem[] = [];
-  isSaving = false;
+  institutions = signal<InstitutionItem[]>([]);
+  programs = signal<ProgramItem[]>([]);
+  isSaving = signal(false);
 
-  educationLevel = EducationLevel.University;
-  get isHighSchool() {
-    return this.educationLevel === EducationLevel.HighSchool;
-  }
+  educationLevel = signal<EducationLevel>(EducationLevel.University);
+  isHighSchool = computed(() => this.educationLevel() === EducationLevel.HighSchool);
 
-  readonly batches = Array.from({ length: 6 }, (_, i) => ({
-    label: `${i + 1}${['st', 'nd', 'rd', 'th', 'th', 'th'][i]} Year`,
-    value: i + 1,
-  }));
+  readonly universityYears = [
+    { label: 'Year 1', value: 1 },
+    { label: 'Year 2', value: 2 },
+    { label: 'Year 3', value: 3 },
+    { label: 'Year 4', value: 4 },
+  ];
 
   readonly highSchoolYears = [
     { label: '1st Year', value: 1 },
     { label: '2nd Year', value: 2 },
   ];
 
-  form = this.fb.nonNullable.group({
+  degreeForm = this.fb.nonNullable.group({
     institutionId: ['', Validators.required],
     institutionProgramId: ['', Validators.required],
     batchYear: [0, Validators.required],
-    gradeLevel: [0],
+    gradeLevel: [null as any as number],
     major: [''],
   });
 
   ngOnInit() {
-    // Determine education level from user state
+    // Determine initial education level from user state
     const user = this.auth.getUserSnapshot();
     const eduLevel = user?.['educationLevel'] ?? EducationLevel.University;
-    this.educationLevel = eduLevel;
-
-    this.setupConditionalValidators();
+    this.educationLevel.set(eduLevel);
 
     // Prefill if editing
     const rec = this.data?.record;
     if (rec) {
-      this.educationLevel = rec.educationLevel;
-      this.setupConditionalValidators();
-      this.form.patchValue({
-        institutionId: rec.institutionName, // will be replaced by id once we have lookup by name
-        institutionProgramId: rec.programName,
+      this.educationLevel.set(rec.educationLevel);
+      this.degreeForm.patchValue({
+        institutionId: rec.institutionId,
+        institutionProgramId: rec.institutionProgramId,
         batchYear: rec.batchYear,
         gradeLevel: rec.gradeLevel,
         major: rec.major ?? '',
       });
     }
 
+    this.setupConditionalValidators();
+
     // Load lookup data
-    this.api.getInstitutions(this.educationLevel).subscribe(res => {
+    this.api.getInstitutions(this.educationLevel()).subscribe(res => {
       if (res.status === 'success') {
-        this.institutions = res.data?.items ?? [];
+        this.institutions.set(res.data?.items ?? []);
       }
     });
-    this.api.getPrograms(this.educationLevel).subscribe(res => {
+    this.api.getPrograms(this.educationLevel()).subscribe(res => {
       if (res.status === 'success') {
-        this.programs = res.data?.items ?? [];
+        this.programs.set(res.data?.items ?? []);
       }
     });
   }
 
   private setupConditionalValidators() {
-    const { gradeLevel, major } = this.form.controls;
+    const { gradeLevel, major } = this.degreeForm.controls;
     gradeLevel.clearValidators();
     major.clearValidators();
-    if (this.isHighSchool) {
+    if (this.isHighSchool()) {
       gradeLevel.setValidators(Validators.required);
     } else {
       major.setValidators(Validators.required);
@@ -248,13 +250,13 @@ export class AcademicEdit implements OnInit {
   }
 
   onSave() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.degreeForm.invalid) {
+      this.degreeForm.markAllAsTouched();
       return;
     }
 
-    const v = this.form.getRawValue();
-    this.isSaving = true;
+    const v = this.degreeForm.getRawValue();
+    this.isSaving.set(true);
 
     const rec = this.data?.record;
 
@@ -264,11 +266,11 @@ export class AcademicEdit implements OnInit {
         institutionId: v.institutionId,
         institutionProgramId: v.institutionProgramId,
         batchYear: v.batchYear,
-        ...(this.isHighSchool ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
+        ...(this.isHighSchool() ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
       };
       this.api.updateAcademic(rec.id, payload).subscribe({
         next: res => {
-          this.isSaving = false;
+          this.isSaving.set(false);
           if (res.status === 'success' && res.data) {
             this.toast.success(res.message || 'Record updated');
             this.dialogRef.close(res.data);
@@ -277,21 +279,21 @@ export class AcademicEdit implements OnInit {
           }
         },
         error: () => {
-          this.isSaving = false;
+          this.isSaving.set(false);
         },
       });
     } else {
       // Create
       const payload = {
-        educationLevel: this.educationLevel,
+        educationLevel: this.educationLevel(),
         institutionId: v.institutionId,
         institutionProgramId: v.institutionProgramId,
         batchYear: v.batchYear,
-        ...(this.isHighSchool ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
+        ...(this.isHighSchool() ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
       };
       this.api.createAcademic(payload).subscribe({
         next: res => {
-          this.isSaving = false;
+          this.isSaving.set(false);
           if (res.status === 'success' && res.data) {
             this.toast.success(res.message || 'Record saved');
             this.dialogRef.close(res.data);
@@ -300,7 +302,7 @@ export class AcademicEdit implements OnInit {
           }
         },
         error: () => {
-          this.isSaving = false;
+          this.isSaving.set(false);
         },
       });
     }
