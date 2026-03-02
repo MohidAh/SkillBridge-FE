@@ -74,14 +74,46 @@
 }
 
 .degree-card {
+    position: relative;
     display: flex;
     gap: 14px;
     align-items: flex-start;
-    padding: 16px;
+    padding: 24px 20px 20px;
     background: var(--mat-sys-surface-container);
-    border: 1.5px solid var(--mat-sys-primary);
-    border-radius: 14px;
+    border: 1.5px solid var(--mat-sys-outline);
+    border-radius: 20px;
+    transition: all 0.2s ease;
     animation: card-in 0.3s ease both;
+
+    &--primary {
+        margin-top: 12px;
+        background: rgb(from var(--mat-sys-primary) r g b / 0.04);
+        border: 1.5px solid var(--mat-sys-primary);
+    }
+
+    &__badge {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        padding: 4px 14px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: var(--mat-sys-on-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: var(--mat-sys-primary);
+        border-radius: 99px;
+        box-shadow: 0 4px 12px rgb(from var(--mat-sys-primary) r g b / 0.4);
+
+        mat-icon {
+            width: 14px;
+            height: 14px;
+            font-size: 14px;
+        }
+    }
 
     &__icon {
         flex-shrink: 0;
@@ -135,6 +167,7 @@
         gap: 6px;
     }
 }
+
 
 @keyframes card-in {
     from {
@@ -278,4 +311,93 @@
     &:hover {
         opacity: 0.88;
     }
+}
+
+// ── Skeleton Loading ─────────────────────────────────────────────────────────
+.skeleton-academic {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fade-in 0.4s ease both;
+}
+
+.skeleton-card {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding: 20px;
+    overflow: hidden;
+    background: var(--mat-sys-surface-container);
+    border: 1.5px solid var(--mat-sys-outline);
+    border-radius: 20px;
+
+    &::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background: linear-gradient(90deg,
+                transparent,
+                rgb(from var(--mat-sys-on-surface) r g b / 0.05),
+                transparent);
+        transform: translateX(-100%);
+        animation: shimmer 1.5s infinite;
+    }
+
+    &__icon {
+        width: 32px;
+        height: 32px;
+        background: var(--mat-sys-surface-container-highest);
+        border-radius: 8px;
+    }
+
+    &__body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__line {
+        width: 60%;
+        height: 14px;
+        background: var(--mat-sys-surface-container-highest);
+        border-radius: 4px;
+
+        &--short {
+            width: 40%;
+        }
+    }
+
+    &__meta {
+        display: flex;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    &__tag {
+        width: 60px;
+        height: 18px;
+        background: var(--mat-sys-surface-container-highest);
+        border-radius: 99px;
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.btn-spinner {
+    margin-right: 8px;
 }

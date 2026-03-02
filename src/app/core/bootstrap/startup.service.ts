@@ -51,9 +51,8 @@ export class StartupService {
 
   private setPermissions(user: User) {
     const basePermissions = ['canAdd', 'canDelete', 'canEdit', 'canRead'];
-    const rolePermission = this.getRolePermission(user?.roleId);
+    const rolePermission = this.getRolePermission(user?.role);
     const permissions = rolePermission ? [...basePermissions, rolePermission] : basePermissions;
-
     this.permissonsService.loadPermissions(permissions);
     this.rolesService.flushRoles();
     this.rolesService.addRoles({ ADMIN: ['ADMIN'], USER: ['USER'] });
@@ -62,12 +61,12 @@ export class StartupService {
     // this.rolesService.addRolesWithPermissions({ ADMIN: permissions });
   }
 
-  private getRolePermission(roleId?: number) {
-    if (roleId === UserRole.SUPER_ADMIN) {
+  private getRolePermission(role?: number) {
+    if (role === UserRole.SUPER_ADMIN) {
       return 'ADMIN';
     }
 
-    if (roleId === UserRole.UNIVERSITY_STUDENT || roleId === UserRole.HIGH_SCHOOL_STUDENT) {
+    if (role === UserRole.UNIVERSITY_STUDENT || role === UserRole.HIGH_SCHOOL_STUDENT) {
       return 'USER';
     }
 

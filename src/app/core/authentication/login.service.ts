@@ -27,4 +27,8 @@ export class LoginService {
   logout() {
     return this.http.post<any>('/api/Auth/logout', {});
   }
+
+  getUser(id: string) {
+    return this.http.get<ApiResponse<any>>(`/api/Users/${id}`);
+  }
 }

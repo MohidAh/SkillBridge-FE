@@ -1,250 +1,170 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
-import { FormsModule } from '@angular/forms';
-import { inject } from '@angular/core';
-import { AssessmentPayload } from '../../onboarding-api.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HotToastService } from '@ngxpert/hot-toast';
+import {
+  OnboardingApiService,
+  PersonalityQuestion,
+  PersonalityResult,
+  PersonalitySubmitPayload,
+} from '../../onboarding-api.service';
+import { finalize } from 'rxjs';
 import { OnboardingService } from '../../onboarding.service';
 
-interface BigFiveQuestion {
-  id: number;
-  text: string;
-  trait: keyof TraitScores;
-  reversed: boolean;
+interface TraitDisplay {
+  label: string;
+  icon: string;
+  color: string;
+  desc: string;
+  key: keyof PersonalityResult;
 }
 
-interface TraitScores {
-  openness: number;
-  conscientiousness: number;
-  extraversion: number;
-  agreeableness: number;
-  neuroticism: number;
-}
-
-const QUESTIONS: BigFiveQuestion[] = [
-  // Openness
+const TRAIT_CONFIG: TraitDisplay[] = [
   {
-    id: 1,
-    text: 'I enjoy exploring new ideas and being creative.',
-    trait: 'openness',
-    reversed: false,
-  },
-  { id: 2, text: 'I have a vivid imagination.', trait: 'openness', reversed: false },
-  { id: 3, text: 'I am not interested in abstract ideas.', trait: 'openness', reversed: true },
-  {
-    id: 4,
-    text: 'I enjoy experiencing different cultures and art forms.',
-    trait: 'openness',
-    reversed: false,
-  },
-  // Conscientiousness
-  {
-    id: 5,
-    text: 'I keep my belongings neat and in order.',
-    trait: 'conscientiousness',
-    reversed: false,
+    label: 'Openness',
+    icon: '🌍',
+    color: '#0f969c',
+    desc: 'Curiosity & creativity',
+    key: 'opennessPercent',
   },
   {
-    id: 6,
-    text: 'I follow a schedule and plan ahead.',
-    trait: 'conscientiousness',
-    reversed: false,
-  },
-  {
-    id: 7,
-    text: 'I often leave things to the last minute.',
-    trait: 'conscientiousness',
-    reversed: true,
-  },
-  {
-    id: 8,
-    text: 'I pay attention to details and avoid mistakes.',
-    trait: 'conscientiousness',
-    reversed: false,
-  },
-  // Extraversion
-  {
-    id: 9,
-    text: 'I feel energized when I am around other people.',
-    trait: 'extraversion',
-    reversed: false,
-  },
-  {
-    id: 10,
-    text: 'I enjoy being the center of attention.',
-    trait: 'extraversion',
-    reversed: false,
-  },
-  {
-    id: 11,
-    text: 'I prefer spending time alone rather than with large groups.',
-    trait: 'extraversion',
-    reversed: true,
-  },
-  {
-    id: 12,
-    text: 'I easily strike up conversations with strangers.',
-    trait: 'extraversion',
-    reversed: false,
-  },
-  // Agreeableness
-  {
-    id: 13,
-    text: 'I find it easy to empathize with others.',
-    trait: 'agreeableness',
-    reversed: false,
-  },
-  { id: 14, text: 'I tend to trust people.', trait: 'agreeableness', reversed: false },
-  { id: 15, text: 'I can be cold and uncaring to others.', trait: 'agreeableness', reversed: true },
-  {
-    id: 16,
-    text: 'I try to help others when they are in need.',
-    trait: 'agreeableness',
-    reversed: false,
-  },
-  // Neuroticism
-  { id: 17, text: 'I often feel anxious or stressed.', trait: 'neuroticism', reversed: false },
-  { id: 18, text: 'My mood changes frequently.', trait: 'neuroticism', reversed: false },
-  { id: 19, text: 'I rarely feel sad or depressed.', trait: 'neuroticism', reversed: true },
-  { id: 20, text: 'I get upset easily under pressure.', trait: 'neuroticism', reversed: false },
-];
-
-const TRAIT_META: Record<
-  keyof TraitScores,
-  { label: string; icon: string; color: string; desc: string }
-> = {
-  openness: { label: 'Openness', icon: '🌍', color: '#0f969c', desc: 'Curiosity & creativity' },
-  conscientiousness: {
     label: 'Conscientiousness',
     icon: '📋',
     color: '#294d61',
     desc: 'Discipline & organization',
+    key: 'conscientiousnessPercent',
   },
-  extraversion: {
+  {
     label: 'Extraversion',
     icon: '🎉',
     color: '#6da5c0',
     desc: 'Sociability & energy',
+    key: 'extraversionPercent',
   },
-  agreeableness: {
+  {
     label: 'Agreeableness',
     icon: '🤝',
     color: '#0c7075',
     desc: 'Compassion & cooperation',
+    key: 'agreeablenessPercent',
   },
-  neuroticism: {
+  {
     label: 'Neuroticism',
     icon: '🌊',
     color: '#072e33',
     desc: 'Emotional sensitivity',
+    key: 'neuroticismPercent',
   },
-};
+];
 
 @Component({
   selector: 'app-step-psychology',
   templateUrl: './step-psychology.html',
   styleUrl: './step-psychology.scss',
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatSliderModule, FormsModule],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSliderModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+  ],
 })
 export class StepPsychology implements OnInit {
-  @Output() saved = new EventEmitter<AssessmentPayload>();
+  @Output() saved = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
 
   private readonly onboarding = inject(OnboardingService);
+  private readonly api = inject(OnboardingApiService);
+  private readonly toast = inject(HotToastService);
 
-  readonly questions = QUESTIONS;
-  readonly traitMeta = TRAIT_META;
-  readonly traits = Object.keys(TRAIT_META) as (keyof TraitScores)[];
+  questions = signal<PersonalityQuestion[]>([]);
+  traitConfig = TRAIT_CONFIG;
 
-  answers: Record<number, number> = {};
-  showResults = false;
-  traitScores: TraitScores = {
-    openness: 0,
-    conscientiousness: 0,
-    extraversion: 0,
-    agreeableness: 0,
-    neuroticism: 0,
-  };
+  answers = signal<Record<string, number>>({});
+  showResults = signal(false);
+  isLoading = signal(false);
+  results = signal<PersonalityResult | null>(null);
+
+  answeredCount = computed(() => Object.keys(this.answers()).length);
+
+  allAnswered = computed(() => {
+    const questionsLength = this.questions().length;
+    return questionsLength > 0 && this.answeredCount() === questionsLength;
+  });
+
+  progress = computed(() => {
+    const questionsLength = this.questions().length;
+    if (questionsLength === 0) return 0;
+    return Math.round((this.answeredCount() / questionsLength) * 100);
+  });
 
   ngOnInit() {
-    // Restore previous answers on back navigation
-    const saved = this.onboarding.snapshot.assessment;
-    if (saved?.answers?.length) {
-      this.questions.forEach((q, i) => {
-        if (saved.answers[i] !== undefined) {
-          this.answers[q.id] = saved.answers[i];
-        }
+    this.isLoading.set(true);
+    this.api
+      .getPersonalityQuestions()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: res => {
+          if (res.status === 'success' && res.data) {
+            this.questions.set(res.data.sort((a, b) => a.displayOrder - b.displayOrder));
+          } else {
+            this.toast.error(res.message || 'Failed to load questions');
+          }
+        },
+        error: () => this.toast.error('Failed to connect to the server'),
       });
+
+    // Check if we already have results in state
+    const savedResults = this.onboarding.snapshot.personalityResult;
+    if (savedResults) {
+      this.results.set(savedResults);
+      this.showResults.set(true);
     }
   }
 
-  get answeredCount() {
-    return Object.keys(this.answers).length;
+  setAnswer(questionId: string, value: number) {
+    this.answers.update(prev => ({ ...prev, [questionId]: value }));
   }
 
-  get allAnswered() {
-    return this.answeredCount === this.questions.length;
-  }
+  submitAssessment() {
+    if (!this.allAnswered()) return;
 
-  get progress() {
-    return Math.round((this.answeredCount / this.questions.length) * 100);
-  }
-
-  setAnswer(questionId: number, value: number) {
-    this.answers[questionId] = value;
-  }
-
-  computeScores(): TraitScores {
-    const sums: TraitScores = {
-      openness: 0,
-      conscientiousness: 0,
-      extraversion: 0,
-      agreeableness: 0,
-      neuroticism: 0,
+    this.isLoading.set(true);
+    const payload: PersonalitySubmitPayload = {
+      answers: Object.entries(this.answers()).map(([questionId, score]) => ({
+        questionId,
+        score,
+      })),
     };
-    const counts: Partial<Record<keyof TraitScores, number>> = {};
 
-    for (const q of this.questions) {
-      const raw = this.answers[q.id] ?? 3;
-      const score = q.reversed ? 6 - raw : raw;
-      sums[q.trait] = (sums[q.trait] || 0) + score;
-      counts[q.trait] = (counts[q.trait] || 0) + 1;
-    }
-
-    return {
-      openness: Math.round((sums.openness / (counts.openness || 1)) * 20),
-      conscientiousness: Math.round(
-        (sums.conscientiousness / (counts.conscientiousness || 1)) * 20
-      ),
-      extraversion: Math.round((sums.extraversion / (counts.extraversion || 1)) * 20),
-      agreeableness: Math.round((sums.agreeableness / (counts.agreeableness || 1)) * 20),
-      neuroticism: Math.round((sums.neuroticism / (counts.neuroticism || 1)) * 20),
-    };
+    this.api
+      .submitPersonality(payload)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: res => {
+          if (res.status === 'success' && res.data) {
+            this.results.set(res.data);
+            this.showResults.set(true);
+            this.onboarding.savePersonalityResult(res.data);
+            this.toast.success('Assessment completed successfully!');
+          } else {
+            this.toast.error(res.message || 'Failed to save assessment');
+          }
+        },
+        error: () => this.toast.error('Failed to submit results'),
+      });
   }
 
-  calculate() {
-    if (!this.allAnswered) return;
-    this.traitScores = this.computeScores();
-    this.showResults = true;
-  }
-
-  submit() {
-    this.saved.emit({
-      ...this.traitScores,
-      answers: this.questions.map(q => this.answers[q.id] ?? 3),
-    });
+  finish() {
+    this.saved.emit();
   }
 
   skip() {
-    this.saved.emit({
-      openness: 0,
-      conscientiousness: 0,
-      extraversion: 0,
-      agreeableness: 0,
-      neuroticism: 0,
-      answers: [],
-    });
+    this.saved.emit();
   }
 }

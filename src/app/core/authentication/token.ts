@@ -20,6 +20,10 @@ export abstract class BaseToken {
     return this.attributes.exp;
   }
 
+  get claims(): any {
+    return {};
+  }
+
   valid() {
     return this.hasAccessToken() && !this.isExpired();
   }
@@ -65,6 +69,10 @@ export class JwtToken extends SimpleToken {
 
   override get exp() {
     return this.payload?.exp;
+  }
+
+  override get claims() {
+    return this.payload;
   }
 
   private get payload(): { exp?: number } {

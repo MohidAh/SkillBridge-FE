@@ -8,9 +8,59 @@ import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '@core';
 import { HotToastService } from '@ngxpert/hot-toast';
-import { OnboardingApiService, PreferenceRecord } from '../../onboarding/onboarding-api.service';
+import {
+  OnboardingApiService,
+  PreferenceRecord,
+  PersonalityResult,
+} from '../../onboarding/onboarding-api.service';
 import { Gender } from '@shared/enums/gender.enums';
 import { EducationLevel } from '@shared/enums/education-level.enums';
+
+interface TraitDisplay {
+  label: string;
+  icon: string;
+  color: string;
+  key: keyof PersonalityResult;
+  desc: string;
+}
+
+const TRAIT_CONFIG: TraitDisplay[] = [
+  {
+    label: 'Openness',
+    icon: '🌍',
+    color: '#0f969c',
+    key: 'opennessPercent',
+    desc: 'Curiosity & creativity',
+  },
+  {
+    label: 'Conscientiousness',
+    icon: '📋',
+    color: '#294d61',
+    key: 'conscientiousnessPercent',
+    desc: 'Discipline & organization',
+  },
+  {
+    label: 'Extraversion',
+    icon: '🎉',
+    color: '#6da5c0',
+    key: 'extraversionPercent',
+    desc: 'Sociability & energy',
+  },
+  {
+    label: 'Agreeableness',
+    icon: '🤝',
+    color: '#0c7075',
+    key: 'agreeablenessPercent',
+    desc: 'Compassion & cooperation',
+  },
+  {
+    label: 'Neuroticism',
+    icon: '🌊',
+    color: '#072e33',
+    key: 'neuroticismPercent',
+    desc: 'Emotional sensitivity',
+  },
+];
 
 @Component({
   selector: 'app-profile-overview',
@@ -28,22 +78,9 @@ export class ProfileOverview implements OnInit {
   isLoading = signal(true);
   personalInfo = signal<any>(null);
   preferences = signal<PreferenceRecord | null>(null);
+  personalityResult = signal<PersonalityResult | null>(null);
 
-  // Icon mapping for interests
-  private readonly interestIcons: Record<string, string> = {
-    'Technology': 'devices',
-    'Healthcare': 'medical_services',
-    'Design': 'palette',
-    'Education': 'school',
-    'Finance': 'leaderboard',
-    'Arts & Design': 'palette',
-    'Business & Finance': 'leaderboard',
-    'Law & Policy': 'gavel',
-    'Environment': 'eco',
-    'Science & Research': 'science',
-    'Marketing': 'campaign',
-    'Social Work': 'group',
-  };
+  traitConfig = TRAIT_CONFIG;
 
   get genderLabel(): string {
     const g = this.personalInfo()?.gender;
@@ -62,11 +99,31 @@ export class ProfileOverview implements OnInit {
     return !!(p?.skills?.length || p?.careerInterests?.length || p?.courseSkills?.length);
   }
 
+  // Icon mapping for interests
+  private readonly interestIcons: Record<string, string> = {
+    'Technology': 'devices',
+    'Healthcare': 'medical_services',
+    'Design': 'palette',
+    'Education': 'school',
+    'Finance': 'leaderboard',
+    'Arts & Design': 'palette',
+    'Business & Finance': 'leaderboard',
+    'Law & Policy': 'gavel',
+    'Environment': 'eco',
+    'Science & Research': 'science',
+    'Marketing': 'campaign',
+    'Social Work': 'group',
+  };
+
   get displayInterests() {
     return (this.preferences()?.careerInterests || []).map(i => ({
       name: i.name,
       icon: this.interestIcons[i.name] || 'stars',
     }));
+  }
+
+  get hasPersonality(): boolean {
+    return !!this.personalityResult();
   }
 
   ngOnInit() {
@@ -85,20 +142,23 @@ export class ProfileOverview implements OnInit {
             name: u?.name || '',
             email: u?.email || '',
           });
-        } else {
-          this.toast.error(res.message || 'Failed to load personal info');
         }
       },
-      error: () => this.isLoading.set(false),
     });
 
     this.api.getPreferences().subscribe({
       next: res => {
-        this.isLoading.set(false);
         if (res.status === 'success') {
           this.preferences.set(res.data);
-        } else {
-          this.toast.error(res.message || 'Failed to load preferences');
+        }
+      },
+    });
+
+    this.api.getPersonalityResult().subscribe({
+      next: res => {
+        this.isLoading.set(false);
+        if (res.status === 'success') {
+          this.personalityResult.set(res.data);
         }
       },
       error: () => this.isLoading.set(false),

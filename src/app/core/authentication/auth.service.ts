@@ -12,6 +12,8 @@ export class AuthService {
   private readonly loginService = inject(LoginService);
   private readonly tokenService = inject(TokenService);
 
+  private readonly userKey = 'skillbridge-user';
+
   private user$ = new BehaviorSubject<User>({});
   private change$ = merge(
     this.tokenService.change(),
@@ -37,12 +39,12 @@ export class AuthService {
     return this.loginService.login(email, password, rememberMe).pipe(
       tap(res => {
         const { token, tokenType, expiresInMinutes, user } = res.data;
+        this.setUser(user);
         this.tokenService.set({
           access_token: token,
           token_type: tokenType,
           expires_in: expiresInMinutes * 60,
         });
-        this.setUser(user);
       }),
       map(() => this.check())
     );
@@ -63,10 +65,12 @@ export class AuthService {
   }
 
   logout() {
-    return this.loginService.logout().pipe(
-      tap(() => this.tokenService.clear()),
-      map(() => !this.check())
-    );
+    this.tokenService.clear();
+    return of(!this.check());
+    // return this.loginService.logout().pipe(
+    //   tap(() => this.tokenService.clear()),
+    //   map(() => !this.check())
+    // );
   }
 
   user() {
@@ -75,6 +79,11 @@ export class AuthService {
 
   setUser(user: User) {
     this.user$.next(user);
+    if (!isEmptyObject(user)) {
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(this.userKey);
+    }
   }
 
   getUserSnapshot(): User {
@@ -87,13 +96,46 @@ export class AuthService {
 
   private assignUser() {
     if (!this.check()) {
-      return of({}).pipe(tap(user => this.user$.next(user)));
+      this.setUser({});
+      return of({});
     }
 
     if (!isEmptyObject(this.user$.getValue())) {
       return of(this.user$.getValue());
     }
 
-    return of({}).pipe(tap(user => this.user$.next(user)));
+    // Try to restore from LocalStorage first
+    const storedUser = localStorage.getItem(this.userKey);
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.setUser(user);
+        return of(user);
+      } catch (e) {
+        localStorage.removeItem(this.userKey);
+      }
+    }
+
+    // If still empty but token is valid, fetch from API
+    const claims = this.tokenService.claims;
+    const userId = claims?.id || claims?.sub || claims?.uid;
+
+    if (userId) {
+      return this.loginService.getUser(userId).pipe(
+        map(res => {
+          if (res.status === 'success') {
+            this.setUser(res.data);
+            return res.data;
+          }
+          return {};
+        }),
+        catchError(() => {
+          this.setUser({});
+          return of({});
+        })
+      );
+    }
+
+    return of({}).pipe(tap(user => this.setUser(user)));
   }
 }

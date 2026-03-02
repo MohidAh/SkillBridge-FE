@@ -59,7 +59,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 12px;
 
-        @media (width <= 540px) {
+        @media (width <=540px) {
             grid-template-columns: 1fr;
         }
     }
@@ -652,4 +652,101 @@
 
 .btn-finish {
     background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-secondary));
+}
+
+// ── Skeleton Loading ─────────────────────────────────────────────────────────
+.skeleton-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fade-in 0.4s ease both;
+}
+
+.skeleton-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &.two-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+
+        @media (width <=540px) {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+.skeleton-field {
+    position: relative;
+    height: 56px;
+    overflow: hidden;
+    background: var(--mat-sys-surface-container-highest);
+    border-radius: 12px;
+
+    &::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background: linear-gradient(90deg,
+                transparent,
+                rgb(from var(--mat-sys-on-surface) r g b / 0.05),
+                transparent);
+        transform: translateX(-100%);
+        animation: shimmer 1.5s infinite;
+    }
+
+    &--large {
+        height: 100px;
+    }
+}
+
+.skeleton-label {
+    width: 60px;
+    height: 16px;
+    background: var(--mat-sys-surface-container-highest);
+    border-radius: 4px;
+}
+
+.skeleton-radio-group {
+    display: flex;
+    gap: 12px;
+}
+
+.skeleton-radio {
+    position: relative;
+    width: 100px;
+    height: 38px;
+    overflow: hidden;
+    background: var(--mat-sys-surface-container-highest);
+    border-radius: 8px;
+
+    &::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background: linear-gradient(90deg,
+                transparent,
+                rgb(from var(--mat-sys-on-surface) r g b / 0.05),
+                transparent);
+        transform: translateX(-100%);
+        animation: shimmer 1.5s infinite;
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

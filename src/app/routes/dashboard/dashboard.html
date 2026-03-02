@@ -36,10 +36,10 @@
     <section class="welcome-banner">
       <div class="welcome-content">
         <h1 class="welcome-title">
-          {{ userData.greeting }},
-          <span class="text-primary">{{ userData.name }}</span>
+          {{ userData().greeting }},
+          <span class="text-primary">{{ userData().name }}</span>
         </h1>
-        <p class="welcome-subtitle">{{ userData.subtitle }}</p>
+        <p class="welcome-subtitle">{{ userData().subtitle }}</p>
       </div>
     </section>
 
@@ -49,13 +49,13 @@
         <section class="careers-section">
           <div class="section-header d-flex align-items-center justify-content-between m-b-16">
             <h2 class="section-title m-0">Recommended Careers</h2>
-            @if (careers.length > 0) {
+            @if (careers().length > 0) {
               <button mat-button color="primary">View All</button>
             }
           </div>
 
           <div class="row">
-            @for (career of careers; track career.name) {
+            @for (career of careers(); track career.name) {
               <div class="col-sm-6 m-b-24">
                 <mat-card class="career-card hvr-lift">
                   <mat-card-header class="m-b-16">
@@ -117,10 +117,10 @@
 
           <mat-card class="personality-card">
             <mat-card-content>
-              @if (hasAssessment) {
+              @if (hasAssessment()) {
                 <p class="text-muted m-b-24">Based on your recent assessment:</p>
                 <div class="traits-list">
-                  @for (trait of personalityTraits; track trait.name) {
+                  @for (trait of personalityTraits(); track trait.name) {
                     <div class="trait-item m-b-20">
                       <div class="d-flex justify-content-between m-b-8">
                         <span class="trait-name">{{ trait.name }}</span>

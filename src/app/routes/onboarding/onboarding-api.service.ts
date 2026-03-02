@@ -13,7 +13,9 @@ const API = {
   preferences: '/api/Preferences/me',
   skills: '/api/Skills',
   careerInterests: '/api/CareerInterests',
-  assessment: '/user/assessment',
+  personalityQuestions: '/api/Personality/questions',
+  personalitySubmit: '/api/Personality/submit',
+  personalityMe: '/api/Personality/me',
 };
 
 // ── Lookup Types ──────────────────────────────────────────
@@ -41,10 +43,39 @@ export interface PagedResponse<T> {
   hasPreviousPage: boolean;
 }
 
-// ── Lookup Types ──────────────────────────────────────────
 export interface LookupItem {
   id: string;
   name: string;
+}
+
+// ── Personality Assessment ────────────────────────────────
+export interface PersonalityQuestion {
+  id: string;
+  text: string;
+  displayOrder: number;
+}
+
+export interface PersonalityAnswer {
+  questionId: string;
+  score: number; // 1 to 5
+}
+
+export interface PersonalitySubmitPayload {
+  answers: PersonalityAnswer[];
+}
+
+export interface PersonalityResult {
+  opennessRaw: number;
+  opennessPercent: number;
+  conscientiousnessRaw: number;
+  conscientiousnessPercent: number;
+  extraversionRaw: number;
+  extraversionPercent: number;
+  agreeablenessRaw: number;
+  agreeablenessPercent: number;
+  neuroticismRaw: number;
+  neuroticismPercent: number;
+  summary: string;
 }
 
 // ── Personal Info ──────────────────────────────────────────
@@ -93,7 +124,9 @@ export interface AcademicRecord {
   id: string;
   educationLevel: number;
   institutionName: string;
+  institutionId: string;
   programName: string;
+  institutionProgramId: string;
   gradeLevel?: number;
   major?: string;
   batchYear: number;
@@ -104,23 +137,6 @@ export interface AcademicRecord {
 export interface AcademicMeResponse {
   primaryAcademic: AcademicRecord;
   academicHistory: AcademicRecord[];
-}
-
-// ── Legacy interfaces kept for other steps (skills, assessment) ──
-export interface DegreeEntry {
-  type: 'high_school' | 'university';
-  educationSystem?: string;
-  subjects?: string;
-  grades?: string;
-  institution?: string;
-  degree?: string;
-  yearBatch?: string;
-  major?: string;
-  degreeFileUrl?: string;
-}
-
-export interface AcademicInfoPayload {
-  degrees: DegreeEntry[];
 }
 
 export interface PreferenceRecord {
@@ -135,7 +151,7 @@ export interface UpdatePreferencePayload {
   courseSkills: string[];
 }
 
-// ── Legacy interfaces kept for other steps (assessment) ──
+// ── Legacy interfaces kept for backward compatibility ──
 export interface AssessmentPayload {
   openness: number;
   conscientiousness: number;
@@ -152,6 +168,10 @@ export class OnboardingApiService {
   // ── Personal ───────────────────────────────────────────
   savePersonalInfo(data: PersonalInfoPayload) {
     return this.http.post<ApiResponse<PersonalInfoPayload>>(API.personalInfo, data);
+  }
+
+  updatePersonalInfo(data: PersonalInfoPayload) {
+    return this.http.put<ApiResponse<PersonalInfoPayload>>(API.personalInfo, data);
   }
 
   getPersonalInfo() {
@@ -201,6 +221,19 @@ export class OnboardingApiService {
     return this.http.get<ApiResponse<PagedResponse<ProgramItem>>>(API.programs, { params });
   }
 
+  // ── Personality Assessment ──────────────────────────────
+  getPersonalityQuestions() {
+    return this.http.get<ApiResponse<PersonalityQuestion[]>>(API.personalityQuestions);
+  }
+
+  submitPersonality(data: PersonalitySubmitPayload) {
+    return this.http.post<ApiResponse<PersonalityResult>>(API.personalitySubmit, data);
+  }
+
+  getPersonalityResult() {
+    return this.http.get<ApiResponse<PersonalityResult>>(API.personalityMe);
+  }
+
   // ── Preferences, Skills & Interests ────────────────────
   getPreferences() {
     return this.http.get<ApiResponse<PreferenceRecord>>(API.preferences);
@@ -216,10 +249,5 @@ export class OnboardingApiService {
 
   getCareerInterests() {
     return this.http.get<ApiResponse<LookupItem[]>>(API.careerInterests);
-  }
-
-  // ── Other steps ────────────────────────────────────────
-  submitAssessment(data: AssessmentPayload) {
-    return this.http.post<AssessmentPayload>(API.assessment, data);
   }
 }

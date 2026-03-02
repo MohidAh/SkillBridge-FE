@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -13,7 +13,11 @@ import { NgStyle } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '@core';
 import { Router } from '@angular/router';
-import { RECOMMENDED_CAREERS, Career } from './data';
+import { Career } from './data';
+import { DashboardApiService } from './dashboard-api.service';
+import { PersonalityResult } from '../onboarding/onboarding-api.service';
+import { finalize, forkJoin } from 'rxjs';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,54 +40,61 @@ export class Dashboard implements OnInit {
   private readonly settings = inject(SettingsService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly dashboardApi = inject(DashboardApiService);
+  private readonly toast = inject(HotToastService);
 
   user = toSignal(this.auth.user());
   isLoading = signal(true);
+  careers = signal<Career[]>([]);
+  personality = signal<PersonalityResult | null>(null);
 
-  get careers(): Career[] {
-    const u = this.user();
-    // For demonstration, if user has career interests, show actual recommendations
-    // Otherwise return empty array which triggers the empty state in template
-    return u?.['careerInterests']?.length ? RECOMMENDED_CAREERS : [];
-  }
+  // Removed manual getter "careers" as it's now a signal
 
-  get userData() {
+  userData = computed(() => {
     const u = this.user();
     return {
       name: u?.name || 'User',
       greeting: 'Welcome back',
       subtitle: 'Here are your recommended career paths based on your profile.',
     };
-  }
+  });
 
-  get personalityTraits() {
-    const u = this.user();
-    const assessment = u?.['assessment'] || {};
+  personalityTraits = computed(() => {
+    const p = this.personality();
     return [
-      { name: 'Openness', percentage: assessment.openness || 0, color: '#0f969c' },
-      {
-        name: 'Conscientiousness',
-        percentage: assessment.conscientiousness || 0,
-        color: '#6da5c0',
-      },
-      { name: 'Extraversion', percentage: assessment.extraversion || 0, color: '#294d61' },
-      { name: 'Agreeableness', percentage: assessment.agreeableness || 0, color: '#0c7075' },
-      { name: 'Neuroticism', percentage: assessment.neuroticism || 0, color: '#ef4444' },
+      { name: 'Openness', percentage: p?.opennessPercent || 0, color: '#0f969c' },
+      { name: 'Conscientiousness', percentage: p?.conscientiousnessPercent || 0, color: '#6da5c0' },
+      { name: 'Extraversion', percentage: p?.extraversionPercent || 0, color: '#294d61' },
+      { name: 'Agreeableness', percentage: p?.agreeablenessPercent || 0, color: '#0c7075' },
+      { name: 'Neuroticism', percentage: p?.neuroticismPercent || 0, color: '#ef4444' },
     ];
-  }
+  });
 
-  get hasAssessment() {
-    return this.personalityTraits.some(t => t.percentage > 0);
-  }
+  hasAssessment = computed(() => this.personalityTraits().some((t: any) => t.percentage > 0));
 
   get isDark() {
     return this.settings.getThemeColor() == 'dark';
   }
 
   ngOnInit() {
-    setTimeout(() => {
-      this.isLoading.set(false);
-    }, 1200);
+    this.isLoading.set(true);
+
+    forkJoin({
+      // recommendations: this.dashboardApi.getRecommendations(),
+      personality: this.dashboardApi.getPersonalityMe(),
+    })
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: res => {
+          // if (res.recommendations.status === 'success') {
+          //   this.careers.set(res.recommendations.data || []);
+          // }
+          if (res.personality.status === 'success') {
+            this.personality.set(res.personality.data);
+          }
+        },
+        error: () => this.toast.error('Failed to load dashboard data'),
+      });
   }
 
   goToOnboarding() {

@@ -1,8 +1,9 @@
-import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   LookupItem,
   OnboardingApiService,
@@ -17,7 +18,14 @@ import { HotToastService } from '@ngxpert/hot-toast';
   selector: 'app-step-skills',
   templateUrl: './step-skills.html',
   styleUrl: './step-skills.scss',
-  imports: [CommonModule, FormsModule, MatButtonModule, MatChipsModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+  ],
 })
 export class StepSkills implements OnInit {
   @Output() saved = new EventEmitter<void>();
@@ -27,16 +35,16 @@ export class StepSkills implements OnInit {
   private readonly api = inject(OnboardingApiService);
   private readonly toast = inject(HotToastService);
 
-  allSkills: LookupItem[] = [];
-  allInterests: LookupItem[] = [];
+  allSkills = signal<LookupItem[]>([]);
+  allInterests = signal<LookupItem[]>([]);
 
-  selectedSkillIds = new Set<string>();
-  selectedInterestIds = new Set<string>();
-  courseSkills: string[] = [];
-  courseInput = '';
+  selectedSkillIds = signal<Set<string>>(new Set());
+  selectedInterestIds = signal<Set<string>>(new Set());
+  courseSkills = signal<string[]>([]);
+  courseInput = signal('');
 
-  isLoading = false;
-  isSaving = false;
+  isLoading = signal(false);
+  isSaving = signal(false);
 
   // Icon mapping for common interests
   private readonly interestIcons: Record<string, string> = {
@@ -57,35 +65,35 @@ export class StepSkills implements OnInit {
   }
 
   private loadData() {
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     // Load available lookups
     this.api.getSkills().subscribe(res => {
       if (res.status === 'success') {
-        this.allSkills = res.data ?? [];
+        this.allSkills.set(res.data ?? []);
       }
     });
 
     this.api.getCareerInterests().subscribe(res => {
       if (res.status === 'success') {
-        this.allInterests = res.data ?? [];
+        this.allInterests.set(res.data ?? []);
       }
     });
 
     // Load current preferences
     this.api.getPreferences().subscribe({
       next: res => {
-        this.isLoading = false;
+        this.isLoading.set(false);
         if (res.status === 'success' && res.data) {
           const d = res.data;
-          this.selectedSkillIds = new Set(d.skills.map(s => s.id));
-          this.selectedInterestIds = new Set(d.careerInterests.map(i => i.id));
-          this.courseSkills = [...(d.courseSkills ?? [])];
+          this.selectedSkillIds.set(new Set(d.skills.map(s => s.id)));
+          this.selectedInterestIds.set(new Set(d.careerInterests.map(i => i.id)));
+          this.courseSkills.set([...(d.courseSkills ?? [])]);
         } else if (res.status !== 'success') {
           this.toast.error(res.message || 'Failed to load preferences');
         }
       },
-      error: () => (this.isLoading = false),
+      error: () => this.isLoading.set(false),
     });
   }
 
@@ -94,25 +102,31 @@ export class StepSkills implements OnInit {
   }
 
   toggleSkill(id: string) {
-    this.selectedSkillIds.has(id)
-      ? this.selectedSkillIds.delete(id)
-      : this.selectedSkillIds.add(id);
+    this.selectedSkillIds.update(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   }
 
   toggleInterest(id: string) {
-    this.selectedInterestIds.has(id)
-      ? this.selectedInterestIds.delete(id)
-      : this.selectedInterestIds.add(id);
+    this.selectedInterestIds.update(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   }
 
   addCourseSkill(value: string) {
     const v = value.trim();
-    if (v && !this.courseSkills.includes(v)) this.courseSkills.push(v);
-    this.courseInput = '';
+    if (v && !this.courseSkills().includes(v)) {
+      this.courseSkills.update(prev => [...prev, v]);
+    }
+    this.courseInput.set('');
   }
 
   removeCourseSkill(skill: string) {
-    this.courseSkills = this.courseSkills.filter(s => s !== skill);
+    this.courseSkills.update(prev => prev.filter(s => s !== skill));
   }
 
   submit() {
@@ -120,23 +134,23 @@ export class StepSkills implements OnInit {
   }
 
   skip() {
-    this.selectedSkillIds.clear();
-    this.selectedInterestIds.clear();
-    this.courseSkills = [];
+    this.selectedSkillIds.set(new Set());
+    this.selectedInterestIds.set(new Set());
+    this.courseSkills.set([]);
     this.save();
   }
 
   private save() {
-    this.isSaving = true;
+    this.isSaving.set(true);
     const payload: UpdatePreferencePayload = {
-      skillIds: Array.from(this.selectedSkillIds),
-      careerInterestIds: Array.from(this.selectedInterestIds),
-      courseSkills: this.courseSkills,
+      skillIds: Array.from(this.selectedSkillIds()),
+      careerInterestIds: Array.from(this.selectedInterestIds()),
+      courseSkills: this.courseSkills(),
     };
 
     this.api.updatePreferences(payload).subscribe({
       next: res => {
-        this.isSaving = false;
+        this.isSaving.set(false);
         if (res.status === 'success') {
           this.toast.success('Preferences saved successfully');
           this.saved.emit();
@@ -144,7 +158,7 @@ export class StepSkills implements OnInit {
           this.toast.error(res.message || 'Failed to save preferences');
         }
       },
-      error: () => (this.isSaving = false),
+      error: () => this.isSaving.set(false),
     });
   }
 }

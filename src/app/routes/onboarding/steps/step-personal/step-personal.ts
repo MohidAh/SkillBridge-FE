@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PersonalInfoPayload, OnboardingApiService } from '../../onboarding-api.service';
 import { OnboardingService } from '../../onboarding.service';
 import { AppValidators } from '@shared/validators/app-validators';
@@ -28,6 +30,8 @@ import { HotToastService } from '@ngxpert/hot-toast';
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
     AppErrorDirective,
@@ -40,6 +44,9 @@ export class StepPersonal implements OnInit {
   private readonly onboarding = inject(OnboardingService);
   private readonly api = inject(OnboardingApiService);
   private readonly toast = inject(HotToastService);
+
+  isLoading = signal(false);
+  isSaving = signal(false);
 
   form = this.fb.nonNullable.group({
     dateOfBirth: ['', [Validators.required, AppValidators.noFutureDate()]],
@@ -80,22 +87,27 @@ export class StepPersonal implements OnInit {
   ];
 
   ngOnInit() {
+    this.isLoading.set(true);
     // First try to prefill from the API
     this.api.getPersonalInfo().subscribe({
       next: res => {
+        this.isLoading.set(false);
         if (res.status === 'success' && res.data) {
           const d = res.data;
           this.form.patchValue(d);
           // Also update in-memory state so Step 2 has the educationLevel
           this.onboarding.patchPersonalInfo(d);
-        } else if (res.status !== 'success') {
+        } else if (res.status !== 'success' && res.status !== undefined) {
           // If status is not success, message should contain why
           this.toast.error(res.message || 'Failed to load personal info');
           this.loadFromLocalStateToForm();
         }
       },
       // Fall back to local onboarding state if API fails
-      error: () => this.loadFromLocalStateToForm(),
+      error: () => {
+        this.isLoading.set(false);
+        this.loadFromLocalStateToForm();
+      },
     });
   }
 
@@ -109,6 +121,7 @@ export class StepPersonal implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
+    this.isSaving.set(true);
     this.saved.emit(this.form.getRawValue());
   }
 }

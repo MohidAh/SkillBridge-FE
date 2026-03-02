@@ -169,7 +169,7 @@
 
 .matero-page-content {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 4rem);
   padding: var(--gutter);
 
   .matero-header+&,

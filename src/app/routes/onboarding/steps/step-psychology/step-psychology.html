@@ -7,21 +7,34 @@
     </p>
   </div>
 
-  @if (!showResults) {
+  @if (isLoading() && questions().length === 0) {
+    <div class="skeleton-questions">
+      <div class="skeleton-progress"></div>
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-card__num"></div>
+          <div class="skeleton-card__body">
+            <div class="skeleton-card__text"></div>
+            <div class="skeleton-card__options"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (!showResults()) {
     <!-- Progress -->
     <div class="assessment-progress">
       <div class="assessment-progress__bar">
-        <div class="assessment-progress__fill" [style.width.%]="progress"></div>
+        <div class="assessment-progress__fill" [style.width.%]="progress()"></div>
       </div>
       <span class="assessment-progress__label">
-        {{ answeredCount }} / {{ questions.length }} answered
+        {{ answeredCount() }} / {{ questions().length }} answered
       </span>
     </div>
 
     <!-- Questions -->
     <div class="questions-list">
-      @for (q of questions; track q.id; let i = $index) {
-        <div class="question-card" [class.question-card--answered]="answers[q.id]">
+      @for (q of questions(); track q.id; let i = $index) {
+        <div class="question-card" [class.question-card--answered]="answers()[q.id]">
           <div class="question-card__num">{{ i + 1 }}</div>
           <div class="question-card__body">
             <p class="question-card__text">{{ q.text }}</p>
@@ -32,8 +45,9 @@
                   <button
                     type="button"
                     class="likert-btn"
-                    [class.likert-btn--selected]="answers[q.id] === val"
+                    [class.likert-btn--selected]="answers()[q.id] === val"
                     (click)="setAnswer(q.id, val)"
+                    [disabled]="isLoading()"
                   >
                     {{ val }}
                   </button>
@@ -48,21 +62,37 @@
 
     <!-- Actions -->
     <div class="step-actions">
-      <button type="button" matButton class="btn-back" (click)="back.emit()">
+      <button
+        type="button"
+        mat-button
+        class="btn-back"
+        (click)="back.emit()"
+        [disabled]="isLoading()"
+      >
         <mat-icon>arrow_back</mat-icon>
         Back
       </button>
       <div style="flex: 1"></div>
-      <button type="button" matButton class="btn-skip" (click)="skip()">Skip this step</button>
+      <button type="button" mat-button class="btn-skip" (click)="skip()" [disabled]="isLoading()">
+        Skip this step
+      </button>
       <button
         type="button"
-        matButton="filled"
+        mat-flat-button
+        color="primary"
         class="btn-next"
-        [disabled]="!allAnswered"
-        (click)="calculate()"
+        [disabled]="!allAnswered() || isLoading()"
+        (click)="submitAssessment()"
       >
-        View Results
-        <mat-icon>insights</mat-icon>
+        @if (isLoading()) {
+          <mat-spinner diameter="18" class="btn-spinner" />
+          Analyzing...
+        } @else {
+          <ng-container>
+            Submit Assessment
+            <mat-icon>insights</mat-icon>
+          </ng-container>
+        }
       </button>
     </div>
   } @else {
@@ -75,33 +105,50 @@
       </div>
 
       <div class="trait-bars">
-        @for (trait of traits; track trait) {
+        @for (trait of traitConfig; track trait.key) {
           <div class="trait-row">
             <div class="trait-row__meta">
-              <span class="trait-row__icon">{{ traitMeta[trait].icon }}</span>
+              <span class="trait-row__icon">{{ trait.icon }}</span>
               <div>
-                <span class="trait-row__name">{{ traitMeta[trait].label }}</span>
-                <span class="trait-row__desc">{{ traitMeta[trait].desc }}</span>
+                <span class="trait-row__name">{{ trait.label }}</span>
+                <span class="trait-row__desc">{{ trait.desc }}</span>
               </div>
             </div>
             <div class="trait-bar-wrap">
               <div class="trait-bar">
-                <div class="trait-bar__fill" [style.width.%]="traitScores[trait]"></div>
+                <div
+                  class="trait-bar__fill"
+                  [style.backgroundColor]="trait.color"
+                  [style.width.%]="results()?.[trait.key]"
+                ></div>
               </div>
-              <span class="trait-bar__score">{{ traitScores[trait] }}%</span>
+              <span class="trait-bar__score">{{ results()?.[trait.key] }}%</span>
             </div>
           </div>
         }
       </div>
 
+      @if (results()?.summary) {
+        <div class="summary-card">
+          <h4>Analysis Summary</h4>
+          <p>{{ results()?.summary }}</p>
+        </div>
+      }
+
       <div class="step-actions">
-        <button type="button" matButton class="btn-back" (click)="showResults = false">
+        <button type="button" mat-button class="btn-back" (click)="showResults.set(false)">
           <mat-icon>arrow_back</mat-icon>
           Retake
         </button>
         <div style="flex: 1"></div>
-        <button type="button" matButton class="btn-skip" (click)="skip()">Skip</button>
-        <button type="button" matButton="filled" class="btn-next btn-finish" (click)="submit()">
+        <button type="button" mat-button class="btn-skip" (click)="skip()">Skip</button>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          class="btn-next btn-finish"
+          (click)="finish()"
+        >
           Finish Setup
           <mat-icon>check_circle</mat-icon>
         </button>
