@@ -69,10 +69,10 @@
           <app-step-personal (saved)="onPersonalSaved($event)" />
         }
         @case (1) {
-          <app-step-academic (saved)="onAcademicSaved($event)" (back)="goBack()" />
+          <app-step-academic (saved)="onAcademicSaved()" (back)="goBack()" />
         }
         @case (2) {
-          <app-step-skills (saved)="onSkillsSaved($event)" (back)="goBack()" />
+          <app-step-skills (saved)="onSkillsSaved()" (back)="goBack()" />
         }
         @case (3) {
           <app-step-psychology (saved)="onAssessmentSaved($event)" (back)="goBack()" />

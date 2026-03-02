@@ -13,7 +13,7 @@ export abstract class BaseToken {
   }
 
   get token_type() {
-    return this.attributes.token_type ?? 'bearer';
+    return this.attributes.token_type ?? 'Bearer';
   }
 
   get exp() {

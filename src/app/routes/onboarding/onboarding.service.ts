@@ -1,10 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import {
   OnboardingApiService,
   PersonalInfoPayload,
-  AcademicInfoPayload,
-  SkillsPayload,
   AssessmentPayload,
 } from './onboarding-api.service';
 import { AuthService } from '@core/authentication/auth.service';
@@ -12,16 +10,12 @@ import { AuthService } from '@core/authentication/auth.service';
 export interface OnboardingState {
   currentStep: number;
   personalInfo: PersonalInfoPayload | null;
-  academicInfo: AcademicInfoPayload | null;
-  skills: SkillsPayload | null;
   assessment: AssessmentPayload | null;
 }
 
 const INITIAL_STATE: OnboardingState = {
   currentStep: 0,
   personalInfo: null,
-  academicInfo: null,
-  skills: null,
   assessment: null,
 };
 
@@ -56,30 +50,19 @@ export class OnboardingService {
   }
 
   savePersonalInfo(data: PersonalInfoPayload) {
+    return this.api.savePersonalInfo(data).pipe(
+      tap(() => {
+        this.state$.next({ ...this.snapshot, personalInfo: data });
+        const currentUser = this.auth.getUserSnapshot();
+        const updatedUser = { ...currentUser, ...data };
+        this.auth.setUser(updatedUser);
+      })
+    );
+  }
+
+  /** Update in-memory state from a preloaded API response (no HTTP call) */
+  patchPersonalInfo(data: PersonalInfoPayload) {
     this.state$.next({ ...this.snapshot, personalInfo: data });
-
-    const currentUser = this.auth.getUserSnapshot();
-    const updatedUser = { ...currentUser, ...data };
-
-    this.auth.setUser(updatedUser);
-  }
-
-  saveAcademicInfo(data: AcademicInfoPayload) {
-    this.state$.next({ ...this.snapshot, academicInfo: data });
-
-    const currentUser = this.auth.getUserSnapshot();
-    const updatedUser = { ...currentUser, ...data };
-
-    this.auth.setUser(updatedUser);
-  }
-
-  saveSkills(data: SkillsPayload) {
-    this.state$.next({ ...this.snapshot, skills: data });
-
-    const currentUser = this.auth.getUserSnapshot();
-    const updatedUser = { ...currentUser, ...data };
-
-    this.auth.setUser(updatedUser);
   }
 
   saveAssessment(data: AssessmentPayload) {
@@ -98,5 +81,9 @@ export class OnboardingService {
   reset() {
     localStorage.removeItem('profileComplete');
     this.state$.next(INITIAL_STATE);
+  }
+
+  updateState(patch: Partial<OnboardingState>) {
+    this.state$.next({ ...this.snapshot, ...patch });
   }
 }

@@ -43,17 +43,16 @@ export class OnboardingWizard implements OnInit {
   }
 
   onPersonalSaved(data: any) {
-    this.onboarding.savePersonalInfo(data);
+    this.onboarding.savePersonalInfo(data).subscribe(() => {
+      this.onboarding.nextStep();
+    });
+  }
+
+  onAcademicSaved() {
     this.onboarding.nextStep();
   }
 
-  onAcademicSaved(data: any) {
-    this.onboarding.saveAcademicInfo(data);
-    this.onboarding.nextStep();
-  }
-
-  onSkillsSaved(data: any) {
-    this.onboarding.saveSkills(data);
+  onSkillsSaved() {
     this.onboarding.nextStep();
   }
 

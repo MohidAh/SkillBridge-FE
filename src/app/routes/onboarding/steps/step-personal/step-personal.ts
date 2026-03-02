@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -6,14 +7,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { PersonalInfoPayload } from '../../onboarding-api.service';
+import { PersonalInfoPayload, OnboardingApiService } from '../../onboarding-api.service';
 import { OnboardingService } from '../../onboarding.service';
+import { AppValidators } from '@shared/validators/app-validators';
+import { AppErrorDirective } from '@shared/directives/app-error.directive';
+import { Gender } from '@shared/enums/gender.enums';
+import { EducationLevel } from '@shared/enums/education-level.enums';
+
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-step-personal',
   templateUrl: './step-personal.html',
   styleUrl: './step-personal.scss',
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -22,6 +30,7 @@ import { OnboardingService } from '../../onboarding.service';
     MatDatepickerModule,
     MatButtonModule,
     MatIconModule,
+    AppErrorDirective,
   ],
 })
 export class StepPersonal implements OnInit {
@@ -29,19 +38,33 @@ export class StepPersonal implements OnInit {
 
   private readonly fb = inject(FormBuilder);
   private readonly onboarding = inject(OnboardingService);
+  private readonly api = inject(OnboardingApiService);
+  private readonly toast = inject(HotToastService);
 
   form = this.fb.nonNullable.group({
-    dateOfBirth: ['', Validators.required],
-    gender: ['', Validators.required],
-    educationLevel: ['', Validators.required],
-    phone: ['', Validators.required],
+    dateOfBirth: ['', [Validators.required, AppValidators.noFutureDate()]],
+    gender: [0, Validators.required],
+    educationLevel: [0, Validators.required],
+    phoneNumber: ['', [Validators.required, AppValidators.phone()]],
     country: ['', Validators.required],
     city: ['', Validators.required],
-    bio: [''],
+    shortBio: [''],
   });
 
-  readonly genders = ['Male', 'Female', 'Prefer not to say'];
-  readonly educationLevels = ['High School', 'University', 'Graduate'];
+  readonly maxDate = new Date();
+
+  readonly genders = [
+    { label: 'Male', value: Gender.Male },
+    { label: 'Female', value: Gender.Female },
+    { label: 'Prefer not to say', value: Gender.PreferNotToSay },
+  ];
+
+  readonly educationLevels = [
+    { label: 'High School', value: EducationLevel.HighSchool },
+    { label: 'University', value: EducationLevel.University },
+    { label: 'Graduate', value: EducationLevel.Graduate },
+    { label: 'Working Professional', value: EducationLevel.WorkingProfessional },
+  ];
 
   readonly countries = [
     'Pakistan',
@@ -57,6 +80,26 @@ export class StepPersonal implements OnInit {
   ];
 
   ngOnInit() {
+    // First try to prefill from the API
+    this.api.getPersonalInfo().subscribe({
+      next: res => {
+        if (res.status === 'success' && res.data) {
+          const d = res.data;
+          this.form.patchValue(d);
+          // Also update in-memory state so Step 2 has the educationLevel
+          this.onboarding.patchPersonalInfo(d);
+        } else if (res.status !== 'success') {
+          // If status is not success, message should contain why
+          this.toast.error(res.message || 'Failed to load personal info');
+          this.loadFromLocalStateToForm();
+        }
+      },
+      // Fall back to local onboarding state if API fails
+      error: () => this.loadFromLocalStateToForm(),
+    });
+  }
+
+  private loadFromLocalStateToForm() {
     const saved = this.onboarding.snapshot.personalInfo;
     if (saved) this.form.patchValue(saved);
   }
