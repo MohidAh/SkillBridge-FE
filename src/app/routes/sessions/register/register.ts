@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { MtxButtonModule } from '@ng-matero/extensions/button';
 import { TranslateModule } from '@ngx-translate/core';
-import { OnboardingApiService } from '../../onboarding/onboarding-api.service';
+import { AuthService } from '@core/authentication';
 
 @Component({
   selector: 'app-register',
@@ -34,7 +34,7 @@ import { OnboardingApiService } from '../../onboarding/onboarding-api.service';
 export class Register {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly onboardingApi = inject(OnboardingApiService);
+  private readonly auth = inject(AuthService);
 
   isSubmitting = false;
 
@@ -84,11 +84,8 @@ export class Register {
     if (this.registerForm.invalid) return;
     this.isSubmitting = true;
 
-    // Mark profile as NOT complete — triggers onboarding wizard after login
-    localStorage.setItem('profileComplete', 'false');
-
     const { fullName, email, password } = this.registerForm.getRawValue();
-    this.onboardingApi.submitRegistration({ fullName, email, password }).subscribe({
+    this.auth.register({ fullName, email, password, role: 1 }).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.router.navigateByUrl('/auth/login');

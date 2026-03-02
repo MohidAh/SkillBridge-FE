@@ -119,6 +119,8 @@
   "website": "Website",
   "company": "Company",
   "email": "Email",
+  "full_name": "Full Name",
+  "invalid_email": "Invalid email",
   "operation": "Operation",
   "edit": "Edit",
   "delete": "Delete",

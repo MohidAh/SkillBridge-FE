@@ -5,6 +5,9 @@ const angular = require('angular-eslint');
 
 module.exports = tseslint.config(
   {
+    ignores: ['schematics/**', 'node_modules/**', 'dist/**', '.angular/**'],
+  },
+  {
     files: ['**/*.ts'],
     ignores: ['schematics/ng-add/files/**'],
     extends: [

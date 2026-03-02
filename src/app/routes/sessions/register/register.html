@@ -40,15 +40,15 @@
           <!-- Full Name -->
           <div class="form-group">
             <mat-form-field appearance="outline" class="register-field w-full">
-              <mat-label>Full Name</mat-label>
+              <mat-label>{{ 'full_name' | translate }}</mat-label>
               <input matInput formControlName="fullName" placeholder="John Doe" required />
               @if (fullName.invalid && fullName.touched) {
                 <mat-error>
                   @if (fullName.errors?.['required']) {
-                    <span>Full name is required</span>
+                    <span>{{ 'validation.required' | translate }}</span>
                   }
                   @if (fullName.errors?.['minlength']) {
-                    <span>At least 2 characters</span>
+                    <span>{{ 'validation.min_length' | translate: { number: 2 } }}</span>
                   }
                 </mat-error>
               }
@@ -58,7 +58,7 @@
           <!-- Email -->
           <div class="form-group">
             <mat-form-field appearance="outline" class="register-field w-full">
-              <mat-label>Email</mat-label>
+              <mat-label>{{ 'email' | translate }}</mat-label>
               <input
                 matInput
                 type="email"
@@ -69,10 +69,10 @@
               @if (email.invalid && email.touched) {
                 <mat-error>
                   @if (email.errors?.['required']) {
-                    <span>Email is required</span>
+                    <span>{{ 'validation.required' | translate }}</span>
                   }
                   @if (email.errors?.['email']) {
-                    <span>Enter a valid email address</span>
+                    <span>{{ 'validation.invalid_email' | translate }}</span>
                   }
                 </mat-error>
               }
@@ -123,7 +123,7 @@
             [disabled]="registerForm.invalid || isSubmitting"
             [loading]="isSubmitting"
           >
-            Create Account
+            {{ 'register' | translate }}
           </button>
 
           <!-- Login link -->
