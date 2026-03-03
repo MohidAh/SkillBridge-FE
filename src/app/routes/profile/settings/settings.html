@@ -11,7 +11,7 @@
         <div class="col-sm-6 m-b-20">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Full Name</mat-label>
-            <input matInput formControlName="name" />
+            <input matInput formControlName="fullName" />
             <mat-icon matSuffix>person</mat-icon>
             <mat-hint>Name cannot be changed here</mat-hint>
           </mat-form-field>
@@ -59,8 +59,10 @@
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Education Level</mat-label>
             <mat-select formControlName="educationLevel">
-              @for (level of educationLevels; track level.value) {
-                <mat-option [value]="level.value">{{ level.label }}</mat-option>
+              @for (level of educationLevels(); track level.educationLevelId) {
+                <mat-option [value]="level.educationLevelId">
+                  {{ level.educationLevelName }}
+                </mat-option>
               }
             </mat-select>
           </mat-form-field>

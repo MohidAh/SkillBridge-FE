@@ -15,8 +15,16 @@ export interface User {
   avatar?: string;
   roles?: any[];
   role?: number;
+  userRoleId?: number;
+  educationLevelId?: number;
+  educationLevelName?: string;
   permissions?: any[];
   profileComplete?: boolean;
+}
+
+export interface EducationLevelOption {
+  educationLevelId: number;
+  educationLevelName: string;
 }
 
 export interface AuthData {
@@ -24,6 +32,7 @@ export interface AuthData {
   tokenType: string;
   expiresInMinutes: number;
   user: User;
+  isOnboarded: boolean;
 }
 
 export interface Token {

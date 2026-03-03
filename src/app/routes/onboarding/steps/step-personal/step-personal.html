@@ -87,8 +87,10 @@
         <mat-form-field appearance="outline" class="step-field">
           <mat-label>Education Level</mat-label>
           <mat-select formControlName="educationLevel">
-            @for (level of educationLevels; track level.value) {
-              <mat-option [value]="level.value">{{ level.label }}</mat-option>
+            @for (level of educationLevels(); track level.educationLevelId) {
+              <mat-option [value]="level.educationLevelId">
+                {{ level.educationLevelName }}
+              </mat-option>
             }
           </mat-select>
         </mat-form-field>

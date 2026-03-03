@@ -15,4 +15,10 @@ export class DashboardApiService {
   getPersonalityMe() {
     return this.http.get<ApiResponse<PersonalityResult>>('/api/Personality/me');
   }
+
+  getJobRecommendations(top = 4) {
+    return this.http.get<ApiResponse<any>>('/api/JobRecommendations/me', {
+      params: { top: top.toString() },
+    });
+  }
 }

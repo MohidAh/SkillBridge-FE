@@ -14,7 +14,7 @@ import {
   PersonalityResult,
 } from '../../onboarding/onboarding-api.service';
 import { Gender } from '@shared/enums/gender.enums';
-import { EducationLevel } from '@shared/enums/education-level.enums';
+import { EducationLevelOption } from '@core/authentication/interface';
 
 interface TraitDisplay {
   label: string;
@@ -81,6 +81,7 @@ export class ProfileOverview implements OnInit {
   personalityResult = signal<PersonalityResult | null>(null);
 
   traitConfig = TRAIT_CONFIG;
+  educationLevels = signal<EducationLevelOption[]>([]);
 
   get genderLabel(): string {
     const g = this.personalInfo()?.gender;
@@ -91,7 +92,8 @@ export class ProfileOverview implements OnInit {
   get educationLevelLabel(): string {
     const e = this.personalInfo()?.educationLevel;
     if (!e) return '';
-    return EducationLevel[e] || 'Other';
+    const level = this.educationLevels().find(l => l.educationLevelId === e);
+    return level ? level.educationLevelName : 'Other';
   }
 
   get hasSkills(): boolean {
@@ -133,13 +135,19 @@ export class ProfileOverview implements OnInit {
   private refreshData() {
     this.isLoading.set(true);
 
+    this.auth.getEducationLevels().subscribe(res => {
+      if (res.status === 'success') {
+        this.educationLevels.set((res.data?.options as EducationLevelOption[]) || []);
+      }
+    });
+
     this.api.getPersonalInfo().subscribe({
       next: res => {
         if (res.status === 'success') {
           const u = this.user();
           this.personalInfo.set({
             ...res.data,
-            name: u?.name || '',
+            fullName: u?.fullName || '',
             email: u?.email || '',
           });
         }

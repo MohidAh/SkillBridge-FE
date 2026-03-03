@@ -14,7 +14,7 @@ import { AuthService } from '@core';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { OnboardingApiService, PersonalInfoPayload } from '../../onboarding/onboarding-api.service';
 import { Gender } from '@shared/enums/gender.enums';
-import { EducationLevel } from '@shared/enums/education-level.enums';
+import { EducationLevelOption } from '@core/authentication/interface';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -46,7 +46,7 @@ export class ProfileSettings implements OnInit {
   isSaving = signal(false);
 
   form = this.fb.nonNullable.group({
-    name: [{ value: '', disabled: true }],
+    fullName: [{ value: '', disabled: true }],
     email: [{ value: '', disabled: true }],
     dateOfBirth: ['', [Validators.required]],
     gender: [null as any as number, [Validators.required]],
@@ -63,12 +63,7 @@ export class ProfileSettings implements OnInit {
     { label: 'Prefer not to say', value: Gender.PreferNotToSay },
   ];
 
-  readonly educationLevels = [
-    { label: 'High School', value: EducationLevel.HighSchool },
-    { label: 'University', value: EducationLevel.University },
-    { label: 'Graduate', value: EducationLevel.Graduate },
-    { label: 'Working Professional', value: EducationLevel.WorkingProfessional },
-  ];
+  educationLevels = signal<EducationLevelOption[]>([]);
 
   readonly countries = [
     'Pakistan',
@@ -84,6 +79,11 @@ export class ProfileSettings implements OnInit {
   ];
 
   ngOnInit() {
+    this.auth.getEducationLevels().subscribe(res => {
+      if (res.status === 'success') {
+        this.educationLevels.set((res.data?.options as EducationLevelOption[]) || []);
+      }
+    });
     this.loadProfile();
   }
 
@@ -91,7 +91,7 @@ export class ProfileSettings implements OnInit {
     const u = this.user();
     if (u) {
       this.form.patchValue({
-        name: u.name || '',
+        fullName: u.fullName || '',
         email: u.email || '',
       });
     }
