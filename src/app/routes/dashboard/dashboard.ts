@@ -62,11 +62,11 @@ export class Dashboard implements OnInit {
   personalityTraits = computed(() => {
     const p = this.personality();
     return [
-      { name: 'Openness', percentage: p?.opennessPercent || 0, color: '#0f969c' },
-      { name: 'Conscientiousness', percentage: p?.conscientiousnessPercent || 0, color: '#6da5c0' },
-      { name: 'Extraversion', percentage: p?.extraversionPercent || 0, color: '#294d61' },
-      { name: 'Agreeableness', percentage: p?.agreeablenessPercent || 0, color: '#0c7075' },
-      { name: 'Neuroticism', percentage: p?.neuroticismPercent || 0, color: '#ef4444' },
+      { name: 'Openness', percentage: p?.opennessPercent || 0, color: '#4bbfc5' },
+      { name: 'Conscientiousness', percentage: p?.conscientiousnessPercent || 0, color: '#4bbfc5' },
+      { name: 'Extraversion', percentage: p?.extraversionPercent || 0, color: '#4bbfc5' },
+      { name: 'Agreeableness', percentage: p?.agreeablenessPercent || 0, color: '#4bbfc5' },
+      { name: 'Neuroticism', percentage: p?.neuroticismPercent || 0, color: '#4bbfc5' },
     ];
   });
 

@@ -116,18 +116,14 @@
                 </div>
               </div>
 
-              <div class="interests-block m-b-24">
-                <h4 class="block-subtitle m-b-12">Career Interests</h4>
-                <div class="row g-2">
-                  @for (interest of displayInterests; track interest.name) {
-                    <div class="col-4">
-                      <div class="interest-tile">
-                        <mat-icon color="primary">{{ interest.icon }}</mat-icon>
-                        <span>{{ interest.name }}</span>
-                      </div>
-                    </div>
-                  }
-                </div>
+              <h4 class="block-subtitle m-b-12">Career Interests</h4>
+              <div class="interest-grid m-b-24">
+                @for (interest of displayInterests; track interest.name) {
+                  <div class="interest-card">
+                    <mat-icon color="primary">{{ interest.icon }}</mat-icon>
+                    <span>{{ interest.name }}</span>
+                  </div>
+                }
               </div>
 
               <div class="course-skills-block">

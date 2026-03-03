@@ -80,7 +80,14 @@
     border-radius: 12px;
 }
 
-.interest-tile {
+
+.interest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.interest-card {
     display: flex;
     flex-direction: column;
     gap: 8px;

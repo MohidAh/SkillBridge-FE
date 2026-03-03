@@ -28,37 +28,37 @@ const TRAIT_CONFIG: TraitDisplay[] = [
   {
     label: 'Openness',
     icon: '🌍',
-    color: '#0f969c',
-    key: 'opennessPercent',
+    color: '#4bbfc5',
     desc: 'Curiosity & creativity',
+    key: 'opennessPercent',
   },
   {
     label: 'Conscientiousness',
     icon: '📋',
-    color: '#294d61',
-    key: 'conscientiousnessPercent',
+    color: '#4bbfc5',
     desc: 'Discipline & organization',
+    key: 'conscientiousnessPercent',
   },
   {
     label: 'Extraversion',
     icon: '🎉',
-    color: '#6da5c0',
-    key: 'extraversionPercent',
+    color: '#4bbfc5',
     desc: 'Sociability & energy',
+    key: 'extraversionPercent',
   },
   {
     label: 'Agreeableness',
     icon: '🤝',
-    color: '#0c7075',
-    key: 'agreeablenessPercent',
+    color: '#4bbfc5',
     desc: 'Compassion & cooperation',
+    key: 'agreeablenessPercent',
   },
   {
     label: 'Neuroticism',
     icon: '🌊',
-    color: '#072e33',
-    key: 'neuroticismPercent',
+    color: '#4bbfc5',
     desc: 'Emotional sensitivity',
+    key: 'neuroticismPercent',
   },
 ];
 
@@ -104,23 +104,23 @@ export class ProfileOverview implements OnInit {
   // Icon mapping for interests
   private readonly interestIcons: Record<string, string> = {
     'Technology': 'devices',
-    'Healthcare': 'medical_services',
+    'Healthcare': 'local_hospital',
     'Design': 'palette',
     'Education': 'school',
-    'Finance': 'leaderboard',
+    'Finance': 'account_balance',
     'Arts & Design': 'palette',
-    'Business & Finance': 'leaderboard',
+    'Business & Finance': 'business_center',
     'Law & Policy': 'gavel',
     'Environment': 'eco',
     'Science & Research': 'science',
-    'Marketing': 'campaign',
-    'Social Work': 'group',
+    'Marketing': 'trending_up',
+    'Social Work': 'people',
   };
 
   get displayInterests() {
     return (this.preferences()?.careerInterests || []).map(i => ({
       name: i.name,
-      icon: this.interestIcons[i.name] || 'stars',
+      icon: i.icon || this.interestIcons[i.name],
     }));
   }
 

@@ -30,7 +30,13 @@
     background-size: 28px 28px;
     opacity: 0.15;
   }
+
+  ::ng-deep .mat-mdc-progress-spinner {
+    display: inline-flex;
+    vertical-align: sub;
+  }
 }
+
 
 // ── Ambient glows ─────────────────────────────────────────────────────────────
 .onboarding-glow {

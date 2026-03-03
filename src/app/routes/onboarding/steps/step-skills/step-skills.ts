@@ -5,6 +5,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
+  CareerInterest,
   LookupItem,
   OnboardingApiService,
   UpdatePreferencePayload,
@@ -36,7 +37,7 @@ export class StepSkills implements OnInit {
   private readonly toast = inject(HotToastService);
 
   allSkills = signal<LookupItem[]>([]);
-  allInterests = signal<LookupItem[]>([]);
+  allInterests = signal<CareerInterest[]>([]);
 
   selectedSkillIds = signal<Set<string>>(new Set());
   selectedInterestIds = signal<Set<string>>(new Set());
@@ -48,16 +49,18 @@ export class StepSkills implements OnInit {
 
   // Icon mapping for common interests
   private readonly interestIcons: Record<string, string> = {
-    'Technology': '💻',
-    'Business & Finance': '📊',
-    'Healthcare': '🏥',
-    'Arts & Design': '🎨',
-    'Law & Policy': '⚖️',
-    'Environment': '🌿',
-    'Education': '🎓',
-    'Science & Research': '🔬',
-    'Marketing': '📣',
-    'Social Work': '🤝',
+    'Technology': 'devices',
+    'Healthcare': 'local_hospital',
+    'Design': 'palette',
+    'Education': 'school',
+    'Finance': 'account_balance',
+    'Arts & Design': 'palette',
+    'Business & Finance': 'business_center',
+    'Law & Policy': 'gavel',
+    'Environment': 'eco',
+    'Science & Research': 'science',
+    'Marketing': 'trending_up',
+    'Social Work': 'people',
   };
 
   ngOnInit() {
@@ -76,7 +79,8 @@ export class StepSkills implements OnInit {
 
     this.api.getCareerInterests().subscribe(res => {
       if (res.status === 'success') {
-        this.allInterests.set(res.data ?? []);
+        const data = res.data ?? [];
+        this.allInterests.set(data.map(i => ({ ...i, icon: this.interestIcons[i.name] })));
       }
     });
 

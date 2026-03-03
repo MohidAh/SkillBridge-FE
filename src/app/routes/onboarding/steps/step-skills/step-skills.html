@@ -68,8 +68,9 @@
           >
             @if (selectedInterestIds().has(interest.id)) {
               <mat-icon class="interest-tick">check_circle</mat-icon>
+            } @else {
+              <mat-icon class="interest-card__icon">{{ interest.icon }}</mat-icon>
             }
-            <span class="interest-card__icon">{{ getInterestIcon(interest.name) }}</span>
             <span class="interest-card__label">{{ interest.name }}</span>
           </button>
         }
