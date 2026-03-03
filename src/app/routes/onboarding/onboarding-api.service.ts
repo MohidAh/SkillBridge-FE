@@ -180,11 +180,11 @@ export class OnboardingApiService {
 
   // ── Onboarding (called once on first academic save) ────
   submitHsOnboarding(data: HsOnboardingPayload) {
-    return this.http.post<ApiResponse<any>>(API.onboardingHs, data);
+    return this.http.post<ApiResponse<AcademicRecord>>(API.onboardingHs, data);
   }
 
   submitUniversityOnboarding(data: UniversityOnboardingPayload) {
-    return this.http.post<ApiResponse<any>>(API.onboardingUniversity, data);
+    return this.http.post<ApiResponse<AcademicRecord>>(API.onboardingUniversity, data);
   }
 
   // ── Academic CRUD ──────────────────────────────────────
