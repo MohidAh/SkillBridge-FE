@@ -210,23 +210,22 @@ export class StepAcademic implements OnInit {
         ...(this.isHighSchool() ? { gradeLevel: v.gradeLevel ?? undefined } : { major: v.major }),
       };
 
-      // Only call onboardingHs/University for the VERY FIRST academic record
+      // New record - Only call onboardingHs/University for the VERY FIRST academic record
       const call$ =
         !this.primaryAcademic() && !this.academicHistory().length
-          ? (this.isHighSchool()
-              ? this.api.submitHsOnboarding({
-                  institutionId: v.institutionId,
-                  institutionProgramId: v.institutionProgramId,
-                  gradeLevel: v.gradeLevel,
-                  batchYear: v.batchYear,
-                })
-              : this.api.submitUniversityOnboarding({
-                  institutionId: v.institutionId,
-                  institutionProgramId: v.institutionProgramId,
-                  major: v.major,
-                  batchYear: v.batchYear,
-                })
-            ).pipe(switchMap(() => this.api.createAcademic(academicPayload)))
+          ? this.isHighSchool()
+            ? this.api.submitHsOnboarding({
+                institutionId: v.institutionId,
+                institutionProgramId: v.institutionProgramId,
+                gradeLevel: v.gradeLevel,
+                batchYear: v.batchYear,
+              })
+            : this.api.submitUniversityOnboarding({
+                institutionId: v.institutionId,
+                institutionProgramId: v.institutionProgramId,
+                major: v.major,
+                batchYear: v.batchYear,
+              })
           : this.api.createAcademic(academicPayload);
 
       call$.subscribe({
