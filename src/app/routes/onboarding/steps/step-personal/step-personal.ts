@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PersonalInfoPayload, OnboardingApiService } from '../../onboarding-api.service';
 import { OnboardingService } from '../../onboarding.service';
@@ -32,7 +31,6 @@ import { HotToastService } from '@ngxpert/hot-toast';
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
