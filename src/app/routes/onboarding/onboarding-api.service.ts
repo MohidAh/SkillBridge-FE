@@ -48,6 +48,12 @@ export interface LookupItem {
   name: string;
 }
 
+export interface CareerInterest {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 // ── Personality Assessment ────────────────────────────────
 export interface PersonalityQuestion {
   id: string;
@@ -141,7 +147,7 @@ export interface AcademicMeResponse {
 
 export interface PreferenceRecord {
   skills: LookupItem[];
-  careerInterests: LookupItem[];
+  careerInterests: CareerInterest[];
   courseSkills: string[];
 }
 
@@ -248,6 +254,6 @@ export class OnboardingApiService {
   }
 
   getCareerInterests() {
-    return this.http.get<ApiResponse<LookupItem[]>>(API.careerInterests);
+    return this.http.get<ApiResponse<CareerInterest[]>>(API.careerInterests);
   }
 }
