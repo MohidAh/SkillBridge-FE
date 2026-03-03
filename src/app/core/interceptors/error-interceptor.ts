@@ -14,7 +14,7 @@ export enum STATUS {
 export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
   const router = inject(Router);
   const toast = inject(HotToastService);
-  const errorPages = [STATUS.FORBIDDEN, STATUS.NOT_FOUND, STATUS.INTERNAL_SERVER_ERROR];
+  const errorPages = [STATUS.FORBIDDEN, STATUS.INTERNAL_SERVER_ERROR];
 
   const getMessage = (error: HttpErrorResponse) => {
     if (error.error?.message) {
