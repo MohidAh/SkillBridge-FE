@@ -38,8 +38,8 @@ export class AuthService {
   login(email: string, password: string, rememberMe = false) {
     return this.loginService.login(email, password, rememberMe).pipe(
       tap(res => {
-        const { token, tokenType, expiresInMinutes, user } = res.data;
-        this.setUser(user);
+        const { token, tokenType, expiresInMinutes, user, isOnboarded } = res.data;
+        this.setUser(user, isOnboarded);
         this.tokenService.set({
           access_token: token,
           token_type: tokenType,
@@ -77,7 +77,8 @@ export class AuthService {
     return this.user$.pipe(share());
   }
 
-  setUser(user: User) {
+  setUser(data: User, isOnboarded?: boolean) {
+    const user = { ...data, isOnboarded };
     this.user$.next(user);
     if (!isEmptyObject(user)) {
       localStorage.setItem(this.userKey, JSON.stringify(user));
@@ -94,9 +95,13 @@ export class AuthService {
     return of([]); // Menu is now defined in the app, returning empty as placeholder
   }
 
+  getEducationLevels() {
+    return this.loginService.getEducationLevels();
+  }
+
   private assignUser() {
     if (!this.check()) {
-      this.setUser({});
+      this.setUser({}, false);
       return of({});
     }
 
@@ -104,38 +109,29 @@ export class AuthService {
       return of(this.user$.getValue());
     }
 
-    // Try to restore from LocalStorage first
     const storedUser = localStorage.getItem(this.userKey);
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
-        this.setUser(user);
+        this.setUser(user, user.isOnboarded);
         return of(user);
       } catch (e) {
         localStorage.removeItem(this.userKey);
       }
     }
 
-    // If still empty but token is valid, fetch from API
-    const claims = this.tokenService.claims;
-    const userId = claims?.id || claims?.sub || claims?.uid;
-
-    if (userId) {
-      return this.loginService.getUser(userId).pipe(
-        map(res => {
-          if (res.status === 'success') {
-            this.setUser(res.data);
-            return res.data;
-          }
-          return {};
-        }),
-        catchError(() => {
-          this.setUser({});
-          return of({});
-        })
-      );
-    }
-
-    return of({}).pipe(tap(user => this.setUser(user)));
+    return this.loginService.getUser().pipe(
+      map(res => {
+        if (res.status === 'success') {
+          this.setUser(res.data, res.data.isOnboarded);
+          return res.data;
+        }
+        return {};
+      }),
+      catchError(() => {
+        this.setUser({});
+        return of({});
+      })
+    );
   }
 }

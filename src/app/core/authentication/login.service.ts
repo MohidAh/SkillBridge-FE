@@ -28,7 +28,11 @@ export class LoginService {
     return this.http.post<any>('/api/Auth/logout', {});
   }
 
-  getUser(id: string) {
-    return this.http.get<ApiResponse<any>>(`/api/Users/${id}`);
+  getUser() {
+    return this.http.get<ApiResponse<AuthData>>(`/api/Auth/me`);
+  }
+
+  getEducationLevels() {
+    return this.http.get<ApiResponse<any>>('/api/Auth/education-level');
   }
 }

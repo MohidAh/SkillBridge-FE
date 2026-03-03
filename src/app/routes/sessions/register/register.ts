@@ -14,6 +14,8 @@ import { Router, RouterLink } from '@angular/router';
 import { MtxButtonModule } from '@ng-matero/extensions/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '@core/authentication';
+import { UserRole } from '@shared/enums/userRole.enums';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-register',
@@ -29,6 +31,7 @@ import { AuthService } from '@core/authentication';
     MatInputModule,
     MtxButtonModule,
     TranslateModule,
+    MatSelectModule,
   ],
 })
 export class Register {
@@ -44,6 +47,7 @@ export class Register {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
+      role: [null as any as number, [Validators.required]],
     },
     {
       validators: [this.matchValidator('password', 'confirmPassword')],
@@ -62,6 +66,14 @@ export class Register {
   get confirmPassword() {
     return this.registerForm.get('confirmPassword')!;
   }
+  get role() {
+    return this.registerForm.get('role')!;
+  }
+
+  readonly roles = [
+    { label: 'High School Student', value: UserRole.HIGH_SCHOOL_STUDENT },
+    { label: 'University Student', value: UserRole.UNIVERSITY_STUDENT },
+  ];
 
   matchValidator(source: string, target: string) {
     return (control: AbstractControl) => {
@@ -84,8 +96,8 @@ export class Register {
     if (this.registerForm.invalid) return;
     this.isSubmitting = true;
 
-    const { fullName, email, password } = this.registerForm.getRawValue();
-    this.auth.register({ fullName, email, password, role: 1 }).subscribe({
+    const { fullName, email, password, role } = this.registerForm.getRawValue();
+    this.auth.register({ fullName, email, password, role }).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.router.navigateByUrl('/auth/login');

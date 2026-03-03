@@ -115,6 +115,21 @@
             </mat-form-field>
           </div>
 
+          <!-- User Role -->
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="register-field w-full">
+              <mat-label>User Role</mat-label>
+              <mat-select formControlName="role" required>
+                @for (r of roles; track r.value) {
+                  <mat-option [value]="r.value">{{ r.label }}</mat-option>
+                }
+              </mat-select>
+              @if (role.invalid && role.touched) {
+                <mat-error>Please select a role</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
           <!-- Submit -->
           <button
             class="register-btn w-full"
