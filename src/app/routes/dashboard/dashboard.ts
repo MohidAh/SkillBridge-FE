@@ -80,15 +80,23 @@ export class Dashboard implements OnInit {
     this.isLoading.set(true);
 
     forkJoin({
-      // recommendations: this.dashboardApi.getRecommendations(),
+      recommendations: this.dashboardApi.getJobRecommendations(4),
       personality: this.dashboardApi.getPersonalityMe(),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: res => {
-          // if (res.recommendations.status === 'success') {
-          //   this.careers.set(res.recommendations.data || []);
-          // }
+          if (res.recommendations.status === 'success') {
+            const jobs = res.recommendations.data.jobs || [];
+            this.careers.set(
+              jobs.map((j: any) => ({
+                name: j.title,
+                description: j.description,
+                match: j.matchPercentage,
+                tags: j.tags || [],
+              }))
+            );
+          }
           if (res.personality.status === 'success') {
             this.personality.set(res.personality.data);
           }

@@ -11,10 +11,12 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PersonalInfoPayload, OnboardingApiService } from '../../onboarding-api.service';
 import { OnboardingService } from '../../onboarding.service';
+import { AuthService } from '@core/authentication';
 import { AppValidators } from '@shared/validators/app-validators';
 import { AppErrorDirective } from '@shared/directives/app-error.directive';
 import { Gender } from '@shared/enums/gender.enums';
 import { EducationLevel } from '@shared/enums/education-level.enums';
+import { EducationLevelOption } from '@core/authentication/interface';
 
 import { HotToastService } from '@ngxpert/hot-toast';
 
@@ -42,6 +44,7 @@ export class StepPersonal implements OnInit {
 
   private readonly fb = inject(FormBuilder);
   private readonly onboarding = inject(OnboardingService);
+  private readonly auth = inject(AuthService);
   private readonly api = inject(OnboardingApiService);
   private readonly toast = inject(HotToastService);
 
@@ -66,12 +69,7 @@ export class StepPersonal implements OnInit {
     { label: 'Prefer not to say', value: Gender.PreferNotToSay },
   ];
 
-  readonly educationLevels = [
-    { label: 'High School', value: EducationLevel.HighSchool },
-    { label: 'University', value: EducationLevel.University },
-    { label: 'Graduate', value: EducationLevel.Graduate },
-    { label: 'Working Professional', value: EducationLevel.WorkingProfessional },
-  ];
+  educationLevels = signal<EducationLevelOption[]>([]);
 
   readonly countries = [
     'Pakistan',
@@ -88,6 +86,14 @@ export class StepPersonal implements OnInit {
 
   ngOnInit() {
     this.isLoading.set(true);
+
+    // Load education levels from API
+    this.auth.getEducationLevels().subscribe(res => {
+      if (res.status === 'success') {
+        this.educationLevels.set((res.data?.options as EducationLevelOption[]) || []);
+      }
+    });
+
     // First try to prefill from the API
     this.api.getPersonalInfo().subscribe({
       next: res => {
