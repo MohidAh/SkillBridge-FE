@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { TokenService } from '@core/authentication';
+import { AuthService, TokenService } from '@core/authentication';
 import { catchError, tap, throwError } from 'rxjs';
 import { BASE_URL, hasHttpScheme } from './base-url-interceptor';
 
@@ -9,6 +9,7 @@ export function tokenInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
   const router = inject(Router);
   const baseUrl = inject(BASE_URL, { optional: true });
   const tokenService = inject(TokenService);
+  const auth = inject(AuthService);
 
   const includeBaseUrl = (url: string) => {
     if (!baseUrl) {
@@ -25,7 +26,12 @@ export function tokenInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
     }
 
     if (router.url.includes('/auth/login')) {
-      router.navigateByUrl('/dashboard');
+      const isOnboarded = auth.getUserSnapshot()?.['isOnboarded'];
+      if (!isOnboarded) {
+        router.navigateByUrl('/onboarding');
+      } else {
+        router.navigateByUrl('/dashboard');
+      }
     }
   };
 

@@ -83,12 +83,7 @@ export class OnboardingService {
     this.auth.setUser(updatedUser);
   }
 
-  markProfileComplete() {
-    localStorage.setItem('profileComplete', 'true');
-  }
-
   reset() {
-    localStorage.removeItem('profileComplete');
     this._state.set(INITIAL_STATE);
   }
 

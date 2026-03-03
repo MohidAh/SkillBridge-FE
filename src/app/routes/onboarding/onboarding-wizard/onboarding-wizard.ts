@@ -62,7 +62,6 @@ export class OnboardingWizard {
 
   onAssessmentSaved(data: any) {
     this.onboarding.saveAssessment(data);
-    this.onboarding.markProfileComplete();
     this.router.navigateByUrl('/dashboard');
   }
 

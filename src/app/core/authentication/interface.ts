@@ -19,7 +19,6 @@ export interface User {
   educationLevelId?: number;
   educationLevelName?: string;
   permissions?: any[];
-  profileComplete?: boolean;
 }
 
 export interface EducationLevelOption {
