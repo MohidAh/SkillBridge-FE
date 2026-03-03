@@ -62,13 +62,12 @@ export class Login {
       .subscribe({
         next: () => {
           this.isSubmitting = false;
-          // Redirect to onboarding if profile not yet complete
-          const profileComplete = this.auth.getUserSnapshot()?.['profileComplete'];
-          if (!profileComplete) {
-            this.router.navigateByUrl('/onboarding');
-          } else {
-            this.router.navigateByUrl('/');
-          }
+          // const isOnboarded = this.auth.getUserSnapshot()?.['isOnboarded'];
+          // if (!isOnboarded) {
+          //   this.router.navigateByUrl('/onboarding');
+          // } else {
+          //   this.router.navigateByUrl('/');
+          // }
         },
         error: (errorRes: HttpErrorResponse) => {
           if (errorRes.status === 422) {
