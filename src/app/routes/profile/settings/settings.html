@@ -113,17 +113,22 @@
       </div>
 
       <div class="d-flex justify-content-end gap-12 m-t-24 p-t-24 border-top">
+        <button mat-button type="button" routerLink="/profile/overview" [disabled]="isSaving()">
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
         <button
           mat-flat-button
           color="primary"
           type="submit"
           [disabled]="form.invalid || isSaving()"
+          class="save-btn"
         >
           @if (isSaving()) {
-            <ng-container>
-              <mat-icon class="spinner-icon">hourglass_empty</mat-icon>
+            <div class="d-flex align-items-center">
+              <mat-progress-spinner mode="indeterminate" diameter="18" class="m-r-8" />
               Saving...
-            </ng-container>
+            </div>
           } @else {
             <ng-container>
               <mat-icon>save</mat-icon>

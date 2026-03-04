@@ -183,7 +183,7 @@
             <!-- University Year or HS Batch Year -->
             @if (!isHighSchool()) {
               <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Current Year</mat-label>
+                <mat-label>Batch Year</mat-label>
                 <mat-select formControlName="batchYear">
                   @for (y of universityYears; track y.value) {
                     <mat-option [value]="y.value">{{ y.label }}</mat-option>

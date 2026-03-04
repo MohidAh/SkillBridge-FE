@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { DatePipe, CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '@core';
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -15,6 +15,8 @@ import {
 } from '../../onboarding/onboarding-api.service';
 import { Gender } from '@shared/enums/gender.enums';
 import { EducationLevelOption } from '@core/authentication/interface';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { SkillsEdit } from './skills-edit';
 
 interface TraitDisplay {
   label: string;
@@ -66,13 +68,23 @@ const TRAIT_CONFIG: TraitDisplay[] = [
   selector: 'app-profile-overview',
   templateUrl: './overview.html',
   styleUrl: './overview.scss',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, DatePipe],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    MatChipsModule,
+    DatePipe,
+    MatDialogModule,
+    RouterLink,
+  ],
 })
 export class ProfileOverview implements OnInit {
   private readonly router = inject(Router);
   private readonly api = inject(OnboardingApiService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(HotToastService);
+  private readonly dialog = inject(MatDialog);
 
   user = toSignal(this.auth.user());
   isLoading = signal(true);
@@ -175,5 +187,18 @@ export class ProfileOverview implements OnInit {
 
   goToOnboarding() {
     this.router.navigateByUrl('/onboarding');
+  }
+
+  editSkills() {
+    const dialogRef = this.dialog.open(SkillsEdit, {
+      width: '600px',
+      maxHeight: '90vh',
+    });
+
+    dialogRef.afterClosed().subscribe(saved => {
+      if (saved) {
+        this.refreshData();
+      }
+    });
   }
 }

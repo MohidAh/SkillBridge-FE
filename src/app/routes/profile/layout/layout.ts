@@ -16,7 +16,6 @@ import { PageHeader } from '@shared';
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
   imports: [
-    RouterLink,
     RouterOutlet,
     MatButtonModule,
     MatCardModule,
