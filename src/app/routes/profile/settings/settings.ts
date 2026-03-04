@@ -9,6 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '@core';
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -34,6 +36,8 @@ import { CommonModule } from '@angular/common';
     MatOptionModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
+    RouterLink,
   ],
 })
 export class ProfileSettings implements OnInit {

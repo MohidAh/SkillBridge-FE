@@ -6,9 +6,9 @@ import screenfull from 'screenfull';
 
 import { Branding } from '../widgets/branding';
 // import { GithubButton } from '../widgets/github-button';
-import { NotificationButton } from '../widgets/notification-button';
-import { TranslateButton } from '../widgets/translate-button';
-import { UserButton } from '../widgets/user-button';
+// import { NotificationButton } from '../widgets/notification-button';
+// import { TranslateButton } from '../widgets/translate-button';
+// import { UserButton } from '../widgets/user-button';
 
 @Component({
   selector: 'app-header',
@@ -24,7 +24,7 @@ import { UserButton } from '../widgets/user-button';
     MatIconModule,
     Branding,
     // GithubButton,
-    NotificationButton,
+    // NotificationButton,
   ],
 })
 export class Header {

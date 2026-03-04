@@ -54,9 +54,13 @@
               <mat-card-header>
                 <div class="card-top-row">
                   <span class="subject-code">
-                    {{ item.gradeLevel ? getGradeLevelName(item.gradeLevel) : '' }}
-                    {{ item.gradeLevel && item.batchYear ? ' - ' : '' }}
-                    {{ item.batchYear ? 'Year ' + item.batchYear : '' }}
+                    @if (item.gradeLevel && item.batchYear) {
+                      Year {{ item.batchYear }}
+                    } @else if (item.gradeLevel) {
+                      {{ getGradeLevelName(item.gradeLevel) }}
+                    } @else if (item.batchYear) {
+                      Year {{ item.batchYear }}
+                    }
                   </span>
                   @if (item.isPrimary) {
                     <mat-chip class="status-badge primary">⭐ Primary</mat-chip>
@@ -74,8 +78,14 @@
                 </div>
                 @if (item.major) {
                   <div class="major-info">
-                    <span class="text-muted">Major:</span>
+                    <span class="text-muted mr-1">Major:</span>
                     <span>{{ item.major }}</span>
+                  </div>
+                }
+                @if (item.gradeLevel && item.batchYear) {
+                  <div class="grade-info m-t-4">
+                    <span class="text-muted mr-1">Grade:</span>
+                    <span>{{ getGradeLevelName(item.gradeLevel) }}</span>
                   </div>
                 }
               </mat-card-content>

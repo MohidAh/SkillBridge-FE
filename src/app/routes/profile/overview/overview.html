@@ -45,6 +45,10 @@
           <mat-card-header class="m-b-16">
             <div class="d-flex w-full justify-content-between align-items-center">
               <h2 class="section-title m-0">Personal Information</h2>
+              <button mat-button color="primary" routerLink="/profile/settings">
+                <mat-icon>edit</mat-icon>
+                Edit Profile
+              </button>
             </div>
           </mat-card-header>
           <mat-card-content>
@@ -103,6 +107,10 @@
           <mat-card-header class="m-b-16">
             <div class="d-flex w-full justify-content-between align-items-center">
               <h2 class="section-title m-0">Skills & Interests</h2>
+              <button mat-button color="primary" (click)="editSkills()">
+                <mat-icon>edit</mat-icon>
+                Edit
+              </button>
             </div>
           </mat-card-header>
           <mat-card-content>
