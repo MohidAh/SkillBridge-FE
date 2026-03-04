@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { InstitutionType } from '@shared/enums/institution-type.enums';
 import { ApiResponse } from '@core/authentication/interface';
 
 const API = {
@@ -16,6 +17,7 @@ const API = {
   personalityQuestions: '/api/Personality/questions',
   personalitySubmit: '/api/Personality/submit',
   personalityMe: '/api/Personality/me',
+  gradeLevels: '/api/Onboarding/grade-levels',
 };
 
 // ── Lookup Types ──────────────────────────────────────────
@@ -31,6 +33,11 @@ export interface ProgramItem {
   name: string;
   institutionType: string;
   isActive: boolean;
+}
+
+export interface GradeLevel {
+  name: string;
+  value: number;
 }
 
 export interface PagedResponse<T> {
@@ -112,7 +119,6 @@ export interface UniversityOnboardingPayload {
 
 // ── Academic CRUD ─────────────────────────────────────────
 export interface AcademicPayload {
-  educationLevel: number;
   institutionId: string;
   institutionProgramId: string;
   gradeLevel?: number; // High School only
@@ -215,13 +221,13 @@ export class OnboardingApiService {
   }
 
   // ── Institutions & Programs ────────────────────────────
-  getInstitutions(type?: number, page = 1, pageSize = 100) {
+  getInstitutions(type?: InstitutionType, page = 1, pageSize = 100) {
     const params: Record<string, any> = { page, pageSize };
     if (type !== undefined) params['type'] = type;
     return this.http.get<ApiResponse<PagedResponse<InstitutionItem>>>(API.institutions, { params });
   }
 
-  getPrograms(type?: number, page = 1, pageSize = 100) {
+  getPrograms(type?: InstitutionType, page = 1, pageSize = 100) {
     const params: Record<string, any> = { page, pageSize };
     if (type !== undefined) params['type'] = type;
     return this.http.get<ApiResponse<PagedResponse<ProgramItem>>>(API.programs, { params });
@@ -255,5 +261,9 @@ export class OnboardingApiService {
 
   getCareerInterests() {
     return this.http.get<ApiResponse<CareerInterest[]>>(API.careerInterests);
+  }
+
+  getGradeLevels() {
+    return this.http.get<ApiResponse<GradeLevel[]>>(API.gradeLevels);
   }
 }

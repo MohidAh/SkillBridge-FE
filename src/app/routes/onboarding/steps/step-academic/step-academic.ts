@@ -10,13 +10,17 @@ import { Observable, map, switchMap, throwError } from 'rxjs';
 import {
   AcademicPayload,
   AcademicRecord,
+  GradeLevel,
   InstitutionItem,
   OnboardingApiService,
   ProgramItem,
 } from '../../onboarding-api.service';
 import { OnboardingService } from '../../onboarding.service';
+import { AuthService } from '@core/authentication/auth.service';
 import { CommonModule } from '@angular/common';
 import { EducationLevel } from '@shared/enums/education-level.enums';
+import { UserRole } from '@shared/enums/userRole.enums';
+import { InstitutionType } from '@shared/enums/institution-type.enums';
 import { AppErrorDirective } from '@shared/directives/app-error.directive';
 
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -45,11 +49,12 @@ export class StepAcademic implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly onboarding = inject(OnboardingService);
   private readonly api = inject(OnboardingApiService);
+  private readonly auth = inject(AuthService);
   private readonly toast = inject(HotToastService);
 
   // Education level from Step 1
   educationLevel = signal<EducationLevel>(EducationLevel.University);
-  isHighSchool = computed(() => this.educationLevel() === EducationLevel.HighSchool);
+  isHighSchool = signal(false);
 
   // Saved records from backend
   primaryAcademic = signal<AcademicRecord | null>(null);
@@ -64,6 +69,8 @@ export class StepAcademic implements OnInit {
   // Dropdowns
   institutions = signal<InstitutionItem[]>([]);
   programs = signal<ProgramItem[]>([]);
+  gradeLevels = signal<GradeLevel[]>([]);
+  batchYears = signal<number[]>([]);
 
   readonly universityYears = [
     { label: 'Year 1', value: 1 },
@@ -88,10 +95,8 @@ export class StepAcademic implements OnInit {
 
   ngOnInit() {
     // Get education level from state saved in Step 1
-    const personalInfo = this.onboarding.snapshot.personalInfo;
-    if (personalInfo?.educationLevel) {
-      this.educationLevel.set(personalInfo.educationLevel);
-    }
+    const user = this.auth.getUserSnapshot();
+    this.isHighSchool.set(user.role === UserRole.HIGH_SCHOOL_STUDENT);
 
     this.setupConditionalValidators();
 
@@ -116,18 +121,40 @@ export class StepAcademic implements OnInit {
       },
     });
 
-    // Load institutions filtered by education level type
-    this.api.getInstitutions(this.educationLevel()).subscribe(res => {
+    // Load institutions filtered by institution type based on user role
+    const instType =
+      user.role === UserRole.HIGH_SCHOOL_STUDENT
+        ? InstitutionType.HighSchool
+        : InstitutionType.University;
+
+    this.api.getInstitutions(instType).subscribe(res => {
       if (res.status === 'success') {
         this.institutions.set(res.data?.items ?? []);
       }
     });
 
-    this.api.getPrograms(this.educationLevel()).subscribe(res => {
+    this.api.getPrograms(instType).subscribe(res => {
       if (res.status === 'success') {
         this.programs.set(res.data?.items ?? []);
       }
     });
+
+    this.api.getGradeLevels().subscribe(res => {
+      if (res.status === 'success') {
+        this.gradeLevels.set(res.data ?? []);
+      }
+    });
+
+    this.generateBatchYears();
+  }
+
+  private generateBatchYears() {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear; i >= currentYear - 26; i--) {
+      years.push(i);
+    }
+    this.batchYears.set(years);
   }
 
   private setupConditionalValidators() {
@@ -203,7 +230,6 @@ export class StepAcademic implements OnInit {
     } else {
       // New record
       const academicPayload: AcademicPayload = {
-        educationLevel: this.educationLevel(),
         institutionId: v.institutionId,
         institutionProgramId: v.institutionProgramId,
         batchYear: v.batchYear,

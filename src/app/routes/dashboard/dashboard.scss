@@ -17,7 +17,7 @@ mtx-alert {
 
 // ── Welcome Banner ─────────────────────────────────────────────────────────────
 .welcome-banner {
-  padding: 48px 40px;
+  padding: 2rem;
   background: linear-gradient(135deg,
       rgb(from var(--mat-sys-primary) r g b / 0.15) 0%,
       rgb(from var(--mat-sys-primary) r g b / 0.05) 100%);
@@ -325,7 +325,7 @@ mtx-alert {
 
 @media (width <=768px) {
   .welcome-banner {
-    padding: 32px 24px;
+    padding: 2rem 1.5rem;
 
     .welcome-title {
       font-size: 1.75rem;

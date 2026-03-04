@@ -53,7 +53,7 @@ export class Dashboard implements OnInit {
   userData = computed(() => {
     const u = this.user();
     return {
-      name: u?.name || 'User',
+      fullName: u?.fullName || 'User',
       greeting: 'Welcome back',
       subtitle: 'Here are your recommended career paths based on your profile.',
     };

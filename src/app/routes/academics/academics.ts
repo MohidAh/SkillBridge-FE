@@ -6,7 +6,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { PageHeader } from '@shared';
 import { AcademicEdit } from './academic-edit';
-import { OnboardingApiService, AcademicRecord } from '../onboarding/onboarding-api.service';
+import {
+  OnboardingApiService,
+  AcademicRecord,
+  GradeLevel,
+} from '../onboarding/onboarding-api.service';
 
 @Component({
   selector: 'app-academics',
@@ -20,6 +24,7 @@ export class Academics implements OnInit {
 
   primaryAcademic = signal<AcademicRecord | null>(null);
   academicHistory = signal<AcademicRecord[]>([]);
+  gradeLevels = signal<GradeLevel[]>([]);
   isLoading = signal(true);
 
   get allRecords(): AcademicRecord[] {
@@ -29,6 +34,15 @@ export class Academics implements OnInit {
 
   ngOnInit() {
     this.loadAcademics();
+    this.loadGradeLevels();
+  }
+
+  private loadGradeLevels() {
+    this.api.getGradeLevels().subscribe(res => {
+      if (res.status === 'success') {
+        this.gradeLevels.set(res.data ?? []);
+      }
+    });
   }
 
   private loadAcademics() {
@@ -102,5 +116,11 @@ export class Academics implements OnInit {
       }
       this.primaryAcademic.set({ ...item, isPrimary: true });
     });
+  }
+
+  getGradeLevelName(value?: number): string {
+    if (value === undefined || value === null) return '';
+    const level = this.gradeLevels().find(l => l.value === value);
+    return level ? level.name : `Grade ${value}`;
   }
 }
