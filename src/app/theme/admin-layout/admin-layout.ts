@@ -2,21 +2,21 @@ import { BidiModule } from '@angular/cdk/bidi';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnDestroy, ViewEncapsulation, inject, viewChild } from '@angular/core';
 import { MatSidenav, MatSidenavContent, MatSidenavModule } from '@angular/material/sidenav';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { NavigationEnd, Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgProgressbar } from 'ngx-progressbar';
 import { NgProgressRouter } from 'ngx-progressbar/router';
 import { Subscription, filter } from 'rxjs';
 
-import { AppSettings, SettingsService } from '@core';
-import { Customizer } from '../customizer/customizer';
+import { AppSettings, SettingsService, AuthService } from '@core';
 import { Header } from '../header/header';
 import { Branding } from '../widgets/branding';
 import { SidebarNotice } from '../sidebar-notice/sidebar-notice';
 import { Sidebar } from '../sidebar/sidebar';
 import { Topmenu } from '../topmenu/topmenu';
 
-const MOBILE_MEDIAQUERY = 'screen and (max-width: 599px)';
-const MONITOR_MEDIAQUERY = 'screen and (min-width: 600px)';
+const MOBILE_MEDIAQUERY = 'screen and (max-width: 767px)';
+const MONITOR_MEDIAQUERY = 'screen and (min-width: 768px)';
 
 @Component({
   selector: 'app-admin-layout',
@@ -25,15 +25,17 @@ const MONITOR_MEDIAQUERY = 'screen and (min-width: 600px)';
   encapsulation: ViewEncapsulation.None,
   imports: [
     RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
     BidiModule,
     MatSidenavModule,
+    MatIconModule,
     NgProgressbar,
     NgProgressRouter,
     Header,
     Topmenu,
     Sidebar,
     SidebarNotice,
-    Branding,
   ],
 })
 export class AdminLayout implements OnDestroy {
@@ -43,6 +45,7 @@ export class AdminLayout implements OnDestroy {
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly router = inject(Router);
   private readonly settings = inject(SettingsService);
+  private readonly auth = inject(AuthService);
 
   options = this.settings.options;
 
@@ -63,7 +66,6 @@ export class AdminLayout implements OnDestroy {
       .subscribe(state => {
         if (state.breakpoints[MOBILE_MEDIAQUERY]) {
           this.isMobileScreen = true;
-          this.options.sidenavCollapsed = false;
         } else {
           this.isMobileScreen = false;
         }
@@ -101,5 +103,11 @@ export class AdminLayout implements OnDestroy {
     this.settings.setOptions(options);
     this.settings.setDirection();
     this.settings.setTheme();
+  }
+
+  logout() {
+    this.auth.logout().subscribe(() => {
+      this.router.navigateByUrl('/auth/login');
+    });
   }
 }

@@ -1,14 +1,12 @@
-import { Component, ViewEncapsulation, input, output } from '@angular/core';
+import { Component, ViewEncapsulation, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import screenfull from 'screenfull';
 
 import { Branding } from '../widgets/branding';
-// import { GithubButton } from '../widgets/github-button';
-// import { NotificationButton } from '../widgets/notification-button';
-// import { TranslateButton } from '../widgets/translate-button';
-// import { UserButton } from '../widgets/user-button';
+import { SettingsService } from '@core';
 
 @Component({
   selector: 'app-header',
@@ -22,12 +20,17 @@ import { Branding } from '../widgets/branding';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     Branding,
     // GithubButton,
     // NotificationButton,
   ],
 })
 export class Header {
+  private readonly settings = inject(SettingsService);
+
+  readonly options = this.settings.options;
+
   readonly showToggle = input(true);
   readonly showBranding = input(false);
 
@@ -38,5 +41,9 @@ export class Header {
     if (screenfull.isEnabled) {
       screenfull.toggle();
     }
+  }
+
+  toggleTheme() {
+    this.settings.setTheme(this.settings.options.theme === 'dark' ? 'light' : 'dark');
   }
 }

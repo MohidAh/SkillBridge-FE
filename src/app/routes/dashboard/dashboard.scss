@@ -1,3 +1,5 @@
+@use '../../../styles/grid/breakpoints';
+
 :host {
   display: block;
   overflow-x: hidden;
@@ -323,7 +325,7 @@ mtx-alert {
   }
 }
 
-@media (width <=768px) {
+@include breakpoints.bp-lt(small) {
   .welcome-banner {
     padding: 2rem 1.5rem;
 

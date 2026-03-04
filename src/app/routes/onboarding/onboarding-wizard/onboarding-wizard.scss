@@ -1,3 +1,5 @@
+@use '../../../../styles/grid/breakpoints';
+
 // =============================================================================
 // Onboarding Wizard — Theme-aware (light + dark) using CSS custom properties
 // ALL colors reference var(--mat-sys-*) tokens. No hardcoded hex values.
@@ -257,10 +259,36 @@
 }
 
 // ── Responsive ───────────────────────────────────────────────────────────────
-@media (width <=640px) {
+@include breakpoints.bp-lt(small) {
+  .onboarding-wrapper {
+    height: auto;
+    padding: 24px 12px 32px;
+  }
+
+  .onboarding-header {
+    margin-bottom: 24px;
+
+    &__title {
+      font-size: 1.5rem;
+    }
+  }
+
   .step-progress {
+    margin-bottom: 24px;
+
     &__meta {
       display: none;
+    }
+
+    &__circle {
+      width: 36px;
+      height: 36px;
+
+      mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+      }
     }
 
     &__connector {
@@ -269,6 +297,7 @@
   }
 
   .onboarding-card {
-    padding: 24px 20px;
+    padding: 24px 16px;
+    border-radius: 20px;
   }
 }

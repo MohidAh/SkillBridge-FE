@@ -1,6 +1,6 @@
-<mat-toolbar>
+<mat-toolbar class="header-toolbar">
   @if (showToggle()) {
-    <button matIconButton (click)="toggleSidenav.emit()">
+    <button mat-icon-button class="menu-toggle" (click)="toggleSidenav.emit()">
       <mat-icon>menu</mat-icon>
     </button>
   }
@@ -11,19 +11,13 @@
 
   <span class="flex-fill"></span>
 
-  <!-- <app-github-button />
+  <div class="header-actions">
+    <button mat-icon-button (click)="toggleTheme()" matTooltip="Toggle Theme">
+      <mat-icon>{{ options.theme === 'dark' ? 'wb_sunny' : 'brightness_2' }}</mat-icon>
+    </button>
 
-  <button matIconButton>
-    <mat-icon>search</mat-icon>
-  </button> -->
-
-  <!-- <app-translate /> -->
-
-  <button matIconButton class="hide-small" (click)="toggleFullscreen()">
-    <mat-icon>fullscreen</mat-icon>
-  </button>
-
-  <!-- <app-notification class="hide-small" /> -->
-
-  <!-- <app-user /> -->
+    <button mat-icon-button (click)="toggleFullscreen()" matTooltip="Toggle Fullscreen">
+      <mat-icon>fullscreen</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
