@@ -212,6 +212,28 @@
             </div>
           }
 
+          <!-- ── Document Upload (UI only) ──────────────────────── -->
+          <div class="doc-upload-section">
+            <p class="doc-upload-section__title">
+              <mat-icon>upload_file</mat-icon>
+              Supporting Document
+              <span class="doc-upload-section__optional">(optional)</span>
+            </p>
+            <label class="file-upload-area" for="doc-academic">
+              <mat-icon class="file-upload-area__icon">description</mat-icon>
+              <span class="file-upload-area__text">
+                Click to upload transcript, certificate or result card
+              </span>
+              <span class="file-upload-area__name">No file chosen</span>
+              <input
+                id="doc-academic"
+                class="file-input-hidden"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+              />
+            </label>
+          </div>
+
           <!-- Actions -->
           <div class="degree-form-actions">
             @if (hasRecords() || editingId()) {
@@ -247,6 +269,7 @@
   }
 
   <!-- Step navigation -->
+
   <div class="step-actions">
     <button type="button" matButton class="btn-back" (click)="back.emit()" [disabled]="isSaving()">
       <mat-icon>arrow_back</mat-icon>
