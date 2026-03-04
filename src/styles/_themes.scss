@@ -58,7 +58,7 @@ html {
     .mat-mdc-card-subtitle,
     .mat-mdc-card-content,
     p,
-    span,
+    span:not(.mdc-button__label),
     h1,
     h2,
     h3,

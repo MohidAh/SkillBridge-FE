@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,17 +25,21 @@ import { StepPsychology } from '../steps/step-psychology/step-psychology';
     StepPsychology,
   ],
 })
-export class OnboardingWizard {
+export class OnboardingWizard implements OnInit {
   protected readonly onboarding = inject(OnboardingService);
   private readonly router = inject(Router);
 
-  // Removed local currentStep signal
+  ngOnInit() {
+    // Always reset to step 0 when the user enters the onboarding flow,
+    // so previous session state is never retained across visits.
+    this.onboarding.reset();
+  }
 
   readonly steps = [
     { label: 'Personal Info', icon: 'person', description: 'Tell us about yourself' },
     { label: 'Academics', icon: 'school', description: 'Your educational background' },
-    { label: 'Skills & Interests', icon: 'auto_awesome', description: 'What you know and love' },
-    { label: 'Personality', icon: 'psychology', description: 'Discover your traits' },
+    { label: 'Skills & Interests', icon: 'track_changes', description: 'What you know and love' },
+    { label: 'Personality', icon: 'spa', description: 'Discover your traits' },
   ];
 
   // Removed ngOnInit subscription
