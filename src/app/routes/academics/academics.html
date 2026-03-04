@@ -54,7 +54,8 @@
               <mat-card-header>
                 <div class="card-top-row">
                   <span class="subject-code">
-                    {{ item.gradeLevel ? 'Year ' + item.gradeLevel : '' }}
+                    {{ item.gradeLevel ? getGradeLevelName(item.gradeLevel) : '' }}
+                    {{ item.gradeLevel && item.batchYear ? ' - ' : '' }}
                     {{ item.batchYear ? 'Year ' + item.batchYear : '' }}
                   </span>
                   @if (item.isPrimary) {

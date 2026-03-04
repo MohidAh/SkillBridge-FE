@@ -171,10 +171,10 @@
             <!-- Grade Level (HS Only) -->
             @if (isHighSchool()) {
               <mat-form-field appearance="outline" class="step-field">
-                <mat-label>Year / Grade</mat-label>
+                <mat-label>Grade</mat-label>
                 <mat-select formControlName="gradeLevel">
-                  @for (y of highSchoolYears; track y.value) {
-                    <mat-option [value]="y.value">{{ y.label }}</mat-option>
+                  @for (y of gradeLevels(); track y.value) {
+                    <mat-option [value]="y.value">{{ y.name }}</mat-option>
                   }
                 </mat-select>
               </mat-form-field>
@@ -193,7 +193,11 @@
             } @else {
               <mat-form-field appearance="outline" class="step-field">
                 <mat-label>Batch Year</mat-label>
-                <input matInput type="number" formControlName="batchYear" placeholder="e.g. 2022" />
+                <mat-select formControlName="batchYear">
+                  @for (year of batchYears(); track year) {
+                    <mat-option [value]="year">{{ year }}</mat-option>
+                  }
+                </mat-select>
               </mat-form-field>
             }
           </div>

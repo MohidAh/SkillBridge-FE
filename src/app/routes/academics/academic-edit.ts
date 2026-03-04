@@ -10,12 +10,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
 import {
   AcademicRecord,
+  GradeLevel,
   InstitutionItem,
   OnboardingApiService,
   ProgramItem,
 } from '../onboarding/onboarding-api.service';
 import { AuthService } from '@core';
 import { EducationLevel } from '@shared/enums/education-level.enums';
+import { UserRole } from '@shared/enums/userRole.enums';
+import { InstitutionType } from '@shared/enums/institution-type.enums';
 
 export interface AcademicEditDialogData {
   record: AcademicRecord | null;
@@ -70,13 +73,13 @@ import { HotToastService } from '@ngxpert/hot-toast';
           </div>
 
           <div class="col-md-6 m-b-16 flex gap-2">
-            <!-- Year / Grade (HS Only) -->
+            <!-- Grade (HS Only) -->
             @if (isHighSchool()) {
               <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Year / Grade</mat-label>
+                <mat-label>Grade</mat-label>
                 <mat-select formControlName="gradeLevel">
-                  @for (y of highSchoolYears; track y.value) {
-                    <mat-option [value]="y.value">{{ y.label }}</mat-option>
+                  @for (y of gradeLevels(); track y.value) {
+                    <mat-option [value]="y.value">{{ y.name }}</mat-option>
                   }
                 </mat-select>
               </mat-form-field>
@@ -95,7 +98,11 @@ import { HotToastService } from '@ngxpert/hot-toast';
             } @else {
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Batch Year</mat-label>
-                <input matInput type="number" formControlName="batchYear" placeholder="e.g. 2022" />
+                <mat-select formControlName="batchYear">
+                  @for (year of batchYears(); track year) {
+                    <mat-option [value]="year">{{ year }}</mat-option>
+                  }
+                </mat-select>
                 @if (degreeForm.get('batchYear')?.invalid && degreeForm.get('batchYear')?.touched) {
                   <mat-error>Required</mat-error>
                 }
@@ -173,10 +180,11 @@ export class AcademicEdit implements OnInit {
 
   institutions = signal<InstitutionItem[]>([]);
   programs = signal<ProgramItem[]>([]);
+  gradeLevels = signal<GradeLevel[]>([]);
+  batchYears = signal<number[]>([]);
   isSaving = signal(false);
 
-  educationLevel = signal<EducationLevel>(EducationLevel.University);
-  isHighSchool = computed(() => this.educationLevel() === EducationLevel.HighSchool);
+  isHighSchool = signal(false);
 
   readonly universityYears = [
     { label: 'Year 1', value: 1 },
@@ -201,13 +209,11 @@ export class AcademicEdit implements OnInit {
   ngOnInit() {
     // Determine initial education level from user state
     const user = this.auth.getUserSnapshot();
-    const eduLevel = user?.['educationLevel'] ?? EducationLevel.University;
-    this.educationLevel.set(eduLevel);
+    this.isHighSchool.set(user.role === UserRole.HIGH_SCHOOL_STUDENT);
 
     // Prefill if editing
     const rec = this.data?.record;
     if (rec) {
-      this.educationLevel.set(rec.educationLevel);
       this.degreeForm.patchValue({
         institutionId: rec.institutionId,
         institutionProgramId: rec.institutionProgramId,
@@ -220,16 +226,39 @@ export class AcademicEdit implements OnInit {
     this.setupConditionalValidators();
 
     // Load lookup data
-    this.api.getInstitutions(this.educationLevel()).subscribe(res => {
+    const instType =
+      user.role === UserRole.HIGH_SCHOOL_STUDENT
+        ? InstitutionType.HighSchool
+        : InstitutionType.University;
+
+    this.api.getInstitutions(instType).subscribe(res => {
       if (res.status === 'success') {
         this.institutions.set(res.data?.items ?? []);
       }
     });
-    this.api.getPrograms(this.educationLevel()).subscribe(res => {
+
+    this.api.getPrograms(instType).subscribe(res => {
       if (res.status === 'success') {
         this.programs.set(res.data?.items ?? []);
       }
     });
+
+    this.api.getGradeLevels().subscribe(res => {
+      if (res.status === 'success') {
+        this.gradeLevels.set(res.data ?? []);
+      }
+    });
+
+    this.generateBatchYears();
+  }
+
+  private generateBatchYears() {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear; i >= 2000; i--) {
+      years.push(i);
+    }
+    this.batchYears.set(years);
   }
 
   private setupConditionalValidators() {
@@ -285,7 +314,6 @@ export class AcademicEdit implements OnInit {
     } else {
       // Create
       const payload = {
-        educationLevel: this.educationLevel(),
         institutionId: v.institutionId,
         institutionProgramId: v.institutionProgramId,
         batchYear: v.batchYear,
