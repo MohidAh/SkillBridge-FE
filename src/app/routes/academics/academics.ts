@@ -62,6 +62,7 @@ export class Academics implements OnInit {
   add() {
     const dialogRef = this.dialog.open(AcademicEdit, {
       width: '560px',
+      maxWidth: '95vw',
       data: { record: null },
     });
 
@@ -79,6 +80,7 @@ export class Academics implements OnInit {
   edit(item: AcademicRecord) {
     const dialogRef = this.dialog.open(AcademicEdit, {
       width: '560px',
+      maxWidth: '95vw',
       data: { record: item },
     });
 

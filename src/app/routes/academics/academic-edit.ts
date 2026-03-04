@@ -144,8 +144,14 @@ import { HotToastService } from '@ngxpert/hot-toast';
   styles: [
     `
       mat-dialog-content {
+        width: 100%;
         min-width: 500px;
         max-width: 600px;
+
+        @media (max-width: 767px) {
+          min-width: auto;
+          padding: 8px !important;
+        }
       }
       .w-full {
         width: 100%;

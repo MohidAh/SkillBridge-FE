@@ -1,3 +1,5 @@
+@use '../../../../styles/grid/breakpoints';
+
 .profile-section {
     .section-title {
         font-size: 1.5rem;
@@ -353,12 +355,38 @@
     }
 }
 
-@media (width <=768px) {
+@include breakpoints.bp-lt(small) {
+    .profile-card {
+        padding: 24px;
+        border-radius: 24px !important;
+    }
+
     .personal-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
 
     .personal-grid .info-item.w-full {
         grid-column: span 1;
+    }
+
+    .interest-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 8px;
+    }
+
+    .interest-card {
+        padding: 12px 6px;
+        border-radius: 16px;
+
+        mat-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+        }
+
+        span {
+            font-size: 0.7rem;
+        }
     }
 }

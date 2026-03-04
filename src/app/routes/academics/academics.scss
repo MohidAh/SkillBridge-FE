@@ -1,3 +1,5 @@
+@use '../../../styles/grid/breakpoints';
+
 .academics-container {
   display: flex;
   flex-direction: column;
@@ -12,17 +14,40 @@
   width: 100%;
 }
 
+/* Large screens: 3 columns */
+@include breakpoints.bp-lt(large) {
+  .subjects-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* Medium screens: 2 columns */
-@media (width <=1024px) {
+@include breakpoints.bp-lt(medium) {
   .subjects-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 /* Small screens: 1 column */
-@media (width <=640px) {
+@include breakpoints.bp-lt(small) {
   .subjects-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .subject-card {
+    min-height: auto !important;
+    padding: 20px !important;
+    border-radius: 24px !important;
+  }
+
+  .empty-state {
+    padding: 40px 16px !important;
+    border-radius: 32px !important;
+
+    .empty-title {
+      font-size: 1.5rem !important;
+    }
   }
 }
 

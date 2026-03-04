@@ -1,3 +1,5 @@
+@use '../../../../../styles/grid/breakpoints';
+
 // Shared step base styles — reused across all step components via @use or copy
 // ALL colors use var(--mat-sys-*) for light/dark mode support
 
@@ -59,7 +61,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 12px;
 
-        @media (width <=540px) {
+        @include breakpoints.bp-lt(small) {
             grid-template-columns: 1fr;
         }
     }
@@ -676,7 +678,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 16px;
 
-        @media (width <=540px) {
+        @include breakpoints.bp-lt(small) {
             grid-template-columns: 1fr;
         }
     }
